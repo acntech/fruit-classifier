@@ -1,0 +1,8 @@
+matplotlib==3.0.3
+google_images_download==2.5.1
+scikit_image==0.14.2
+numpy==1.16.2
+keras==2.2.4
+scikit-image==0.15.0
+scikit_learn==0.20.3
+opencv-python==4.1.0.25
