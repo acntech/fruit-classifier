@@ -1,4 +1,5 @@
 import cv2
+from keras.preprocessing.image import ImageDataGenerator
 from tqdm import tqdm
 from skimage.transform import resize
 from pathlib import Path
@@ -66,3 +67,24 @@ def preprocess_image(image):
     preprocessed_image = preprocessed_image / 255.0
 
     return preprocessed_image
+
+
+def get_image_generator():
+    """
+    Returns the image generator
+
+    Returns
+    -------
+    image_generator : ImageDataGenerator
+        Generator used for batches
+    """
+
+    image_generator = ImageDataGenerator(rotation_range=30,
+                                         width_shift_range=0.1,
+                                         height_shift_range=0.1,
+                                         shear_range=0.2,
+                                         zoom_range=0.2,
+                                         horizontal_flip=True,
+                                         fill_mode='nearest')
+
+    return image_generator

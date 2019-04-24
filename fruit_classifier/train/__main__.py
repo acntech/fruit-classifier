@@ -6,6 +6,8 @@ from fruit_classifier.train.train_utils import get_model_input
 from fruit_classifier.train.train_utils import get_model
 from fruit_classifier.train.train_utils import train_model
 from fruit_classifier.train.train_utils import plot_training
+from fruit_classifier.preprocessing.preprocessing_utils import \
+    get_image_generator
 
 
 def main():
@@ -40,8 +42,12 @@ def main():
             labels = pickle.load(f)
     else:
         data, labels = get_data_and_labels(image_paths)
-    x_train, x_val, y_train, y_val, image_generator = \
+
+    x_train, x_val, y_train, y_val = \
         get_model_input(data, labels)
+
+    # Construct the image generator for data augmentation
+    image_generator = get_image_generator()
 
     # Initialize the model
     model = get_model(len(set(labels)))

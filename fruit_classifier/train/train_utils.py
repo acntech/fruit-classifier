@@ -1,4 +1,3 @@
-import sys
 import random
 import pickle
 import numpy as np
@@ -122,8 +121,6 @@ def get_model_input(data, labels):
         The training labels
     y_val : np.array, shape (n_val,)
         The validation labels
-    image_generator : ImageDataGenerator
-        Generator used for batches
     """
 
     label_encoder = LabelEncoder()
@@ -155,16 +152,7 @@ def get_model_input(data, labels):
     y_train = to_categorical(y_train, num_classes=num_classes)
     y_val = to_categorical(y_val, num_classes=num_classes)
 
-    # Construct the image generator for data augmentation
-    image_generator = ImageDataGenerator(rotation_range=30,
-                                         width_shift_range=0.1,
-                                         height_shift_range=0.1,
-                                         shear_range=0.2,
-                                         zoom_range=0.2,
-                                         horizontal_flip=True,
-                                         fill_mode='nearest')
-
-    return x_train, x_val, y_train, y_val, image_generator
+    return x_train, x_val, y_train, y_val
 
 
 def get_model(n_classes,
