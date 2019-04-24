@@ -11,13 +11,13 @@ def main(categories=('bananas', 'apples', 'oranges'),
 
     Parameters
     ----------
-    categories : array
+    categories : array-like
         The categories to scrape
     limit : int
         The maximum amount of images to scrape for each category
     """
 
-    root_dir = Path(__file__).absolute().parents[1]
+    root_dir = Path(__file__).absolute().parents[2]
     response = google_images_download.googleimagesdownload()
 
     keywords = ','.join(categories)
@@ -27,13 +27,16 @@ def main(categories=('bananas', 'apples', 'oranges'),
          'limit': limit,
          'print_urls': True,
          'chromedriver': root_dir.joinpath('chromedriver')}
+
     _ = response.download(arguments)
-    destination_dir = root_dir.parent.joinpath('raw_data')
+
+    destination_dir = root_dir.joinpath('raw_data')
 
     if not destination_dir.is_dir():
         destination_dir.mkdir(parents=True, exist_ok=True)
 
-    shutil.move(root_dir, destination_dir)
+    shutil.move(str(root_dir.joinpath('downloads')),
+                str(destination_dir))
 
 
 if __name__ == '__main__':
@@ -53,4 +56,14 @@ if __name__ == '__main__':
                              'for each category')
     args = parser.parse_args()
 
-    main(args['categories'], args['limit'])
+    if args.categories is None:
+        categories = ('bananas', 'apples', 'oranges')
+    else:
+        categories = args.categories
+
+    if args.limit is None:
+        limit = 700
+    else:
+        limit = args.limit
+
+    main(categories, limit)

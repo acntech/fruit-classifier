@@ -29,7 +29,7 @@ def draw_class_on_image(image, probability_text):
     output_image = resize(image,
                           output_shape=(width, height),
                           mode='reflect',
-                          anti_aliasing=True)
+                          anti_aliasing=True).astype(np.uint8)
 
     cv2.putText(output_image,
                 probability_text,
@@ -55,15 +55,18 @@ def classify(model, images):
 
     Returns
     -------
-    labels
-    probabilities
+    labels : np.array, shape (examples, )
+        The label with the highest probability
+    probabilities : np.array, shape (examples, n_classes)
+        The probabilities of all the classes according to the label
+        encoder
     """
     probabilities = model.predict(images)
-    labels = np.argmax(probabilities)
+    labels = np.argmax(probabilities, axis=1)
 
     # Load the label encoder
     encoder_dir = \
-        Path(__file__).absolute().parents[1].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('generated_data',
                                                       'encoders')
     encoder_path = encoder_dir.joinpath('encoder.pkl')
 
@@ -87,7 +90,7 @@ def load_classifier():
 
     print('[INFO] loading network...')
     model_dir = \
-        Path(__file__).absolute().parents[1].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('generated_data',
                                                       'models')
     model_path = model_dir.joinpath('model.h5')
     model = load_model(str(model_path))

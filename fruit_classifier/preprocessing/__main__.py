@@ -11,7 +11,7 @@ def main():
     """
 
     generated_data_dir = \
-        Path(__file__).absolute().parents[1].joinpath('generated_data')
+        Path(__file__).absolute().parents[2].joinpath('generated_data')
     raw_dir = generated_data_dir.joinpath('raw_data')
     cleaned_dir = generated_data_dir.joinpath('cleaned_data')
 

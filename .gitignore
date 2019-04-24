@@ -115,9 +115,5 @@ dmypy.json
 *.swo
 .idea/
 .DS_Store
-*.h5
-example/
-downloads/
+generated_data/
 chromedriver
-*.png
-*.xz

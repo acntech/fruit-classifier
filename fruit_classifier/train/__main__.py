@@ -1,3 +1,4 @@
+import pickle
 from pathlib import Path
 from fruit_classifier.train.train_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
@@ -22,14 +23,23 @@ def main():
     """
 
     generated_data_dir = \
-        Path(__file__).absolute().parents[1].joinpath('generated_data')
+        Path(__file__).absolute().parents[2].joinpath('generated_data')
     cleaned_dir = generated_data_dir.joinpath('cleaned_data')
+    preprocessed_dir = generated_data_dir.joinpath('preprocessed_data')
 
     # Grab the image paths and randomly shuffle them
     image_paths = get_image_paths(cleaned_dir)
 
     # Load the data and and label and split to train and validation
-    data, labels = get_data_and_labels(image_paths)
+    data_path = preprocessed_dir.joinpath('data.pkl')
+    labels_path = preprocessed_dir.joinpath('labels.pkl')
+    if data_path.is_file() and labels_path.is_file():
+        with data_path.open('rb') as f:
+            data = pickle.load(f)
+        with labels_path.open('rb') as f:
+            labels = pickle.load(f)
+    else:
+        data, labels = get_data_and_labels(image_paths)
     x_train, x_val, y_train, y_val, image_generator = \
         get_model_input(data, labels)
 

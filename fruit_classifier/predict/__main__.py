@@ -35,7 +35,7 @@ def main(image_path):
     # Classify the input image
     labels, probabilities = classify(model, image)
     label = labels[0]
-    probability = probabilities[0]
+    probability = np.max(probabilities[0])
 
     probability_text = '{}: {:.2f}%'.format(label, probability * 100)
 
@@ -57,4 +57,4 @@ if __name__ == '__main__':
                         help='Path to input image')
     args = parser.parse_args()
 
-    main(args['image'])
+    main(args.image)

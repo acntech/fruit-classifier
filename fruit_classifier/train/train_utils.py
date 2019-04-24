@@ -1,3 +1,4 @@
+import sys
 import random
 import pickle
 import numpy as np
@@ -61,8 +62,9 @@ def get_data_and_labels(image_paths):
     data = list()
     labels = list()
     # Loop over the input images
-    for image_path in tqdm(image_paths, desc='Loading and '
-                                             'pre-processing images'):
+    for image_path in tqdm(image_paths,
+                           desc='Loading and pre-processing images'):
+        tqdm.write(str(image_path))
         # Load the image, pre-process it, and store it in the data list
         image_array = open_image(image_path)
         processed_image = preprocess_image(image_array)
@@ -75,6 +77,26 @@ def get_data_and_labels(image_paths):
     # Scale the raw pixel intensities to the range [0, 1]
     data = np.array(data, dtype='float')
     labels = np.array(labels)
+
+    # Pickle the data and labels
+    processed_dir =  \
+        Path(__file__).absolute().parents[2].\
+        joinpath('generated_data', 'preprocessed_data')
+
+    if not processed_dir.is_dir():
+        processed_dir.mkdir(parents=True, exist_ok=True)
+
+    data_path = processed_dir.joinpath('data.pkl')
+
+    with data_path.open('wb') as f:
+        pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+        print('[INFO] Saved to {}'.format(data_path))
+
+    labels_path = processed_dir.joinpath('labels.pkl')
+
+    with labels_path.open('wb') as f:
+        pickle.dump(labels, f, pickle.HIGHEST_PROTOCOL)
+        print('[INFO] Saved to {}'.format(labels_path))
 
     return data, labels
 
@@ -109,8 +131,11 @@ def get_model_input(data, labels):
     encoded_labels = label_encoder.transform(labels)
 
     encoder_dir =  \
-        Path(__file__).absolute().parents[1].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('generated_data',
                                                       'encoders')
+    if not encoder_dir.is_dir():
+        encoder_dir.mkdir(parents=True, exist_ok=True)
+
     encoder_path = encoder_dir.joinpath('encoder.pkl')
 
     with encoder_path.open('wb') as f:
@@ -231,12 +256,15 @@ def train_model(model,
 
     print('[INFO] Training network...')
 
+    train_batch_ratio = len(x_train) // batch_size
+    steps_per_epoch = train_batch_ratio if train_batch_ratio > 0 else 1
+
     history = \
         model.fit_generator(image_generator.flow(x_train,
                                                  y_train,
                                                  batch_size=batch_size),
                             validation_data=(x_val, y_val),
-                            steps_per_epoch=len(x_train) // batch_size,
+                            steps_per_epoch=steps_per_epoch,
                             epochs=epochs,
                             verbose=1)
 
@@ -244,7 +272,7 @@ def train_model(model,
     print('[INFO] Serializing network...')
 
     model_dir = \
-        Path(__file__).absolute().parents[1].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('generated_data',
                                                       'models')
     model_path = model_dir.joinpath('model.h5')
 
@@ -290,8 +318,8 @@ def plot_training(history):
     plt.legend(loc='lower left')
 
     plot_dir = \
-        Path(__file__).absolute().parent.joinpath('generated_data',
-                                                  'plots')
+        Path(__file__).absolute().parents[2].joinpath('generated_data',
+                                                      'plots')
 
     if not plot_dir.is_dir():
         plot_dir.mkdir(parents=True, exist_ok=True)
