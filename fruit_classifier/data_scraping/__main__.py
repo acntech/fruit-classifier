@@ -1,5 +1,4 @@
 import argparse
-import shutil
 from pathlib import Path
 from google_images_download import google_images_download
 
@@ -18,6 +17,11 @@ def main(categories=('bananas', 'apples', 'oranges'),
     """
 
     root_dir = Path(__file__).absolute().parents[2]
+    destination_dir = root_dir.joinpath('generated_data', 'raw_data')
+
+    if not destination_dir.is_dir():
+        destination_dir.mkdir(parents=True, exist_ok=True)
+
     response = google_images_download.googleimagesdownload()
 
     keywords = ','.join(categories)
@@ -26,17 +30,13 @@ def main(categories=('bananas', 'apples', 'oranges'),
         {'keywords': keywords,
          'limit': limit,
          'print_urls': True,
-         'chromedriver': root_dir.joinpath('chromedriver')}
+         'usage_rights': 'labeled-for-nocommercial-reuse',
+         'output_directory': str(destination_dir),
+         'chromedriver': str(root_dir.joinpath('chromedriver'))}
 
     _ = response.download(arguments)
 
-    destination_dir = root_dir.joinpath('raw_data')
-
-    if not destination_dir.is_dir():
-        destination_dir.mkdir(parents=True, exist_ok=True)
-
-    shutil.move(str(root_dir.joinpath('downloads')),
-                str(destination_dir))
+    print('[INFO] Saved to {}'.format(destination_dir))
 
 
 if __name__ == '__main__':
@@ -57,13 +57,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.categories is None:
-        categories = ('bananas', 'apples', 'oranges')
+        categories_ = ('bananas', 'apples', 'oranges')
     else:
-        categories = args.categories
+        categories_ = args.categories
 
     if args.limit is None:
-        limit = 700
+        limit_ = 700
     else:
-        limit = args.limit
+        limit_ = args.limit
 
-    main(categories, limit)
+    main(categories_, limit_)
