@@ -1,11 +1,11 @@
 from pathlib import Path
-from fruit_classifier.preprocessing.image_cleaner import \
+from fruit_classifier.preprocessing.preprocessing_utils import \
     remove_non_images
 
 
 def main():
     """"
-    Preprocesses the images in raw_data
+    Pre-processes the images in raw_data
 
     The resulting images are stored in cleaned_data
     """

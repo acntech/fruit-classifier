@@ -1,3 +1,4 @@
+from skimage.transform import resize
 from pathlib import Path
 import shutil
 import cv2
@@ -25,10 +26,34 @@ def remove_non_images(raw_dir, clean_dir):
         image = cv2.imread(str(image_path))
 
         if image is None:
-            print('Unlinking {}'.format(image_path))
+            print('Un-linking {}'.format(image_path))
             image_path.unlink()
     dirs = sorted(raw_dir.glob('*'))
     dirs = [d for d in dirs if d.is_dir()]
     for d in dirs:
         all_files = list(d.glob('*'))
         print('{} files found in {}'.format(d, len(all_files)))
+
+
+def preprocess_image(image):
+    """
+    Pre-processes a single image
+
+    Parameters
+    ----------
+    image : np.array, shape (height, width, channels)
+        The image to resize
+
+    Returns
+    -------
+    preprocessed_image : np.array, shape (new_h, new_w, new_c)
+        The preprocessed image
+    """
+
+    preprocessed_image = resize(image,
+                                output_shape=(28, 28),
+                                mode='reflect',
+                                anti_aliasing=True)
+    preprocessed_image = preprocessed_image / 255.0
+
+    return preprocessed_image

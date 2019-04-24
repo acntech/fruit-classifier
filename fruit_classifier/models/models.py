@@ -1,4 +1,3 @@
-# import the necessary packages
 from keras.models import Sequential
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
@@ -6,17 +5,17 @@ from keras.layers import Flatten
 from keras.layers import Dense
 
 
-def get_lenet(width, height, depth, classes):
+def get_lenet(height, width, channels, classes):
     """
-    Implementation of a LeNet like architecture
+    Implementation of a LeNet like architecture with input (h, w, c)
 
     Parameters
     ----------
+    height : int
+        Pixel height of the image
     width : int
         Pixel width of the image
-    height : int
-        Pixel width of the image
-    depth : int
+    channels : int
         Number of channels
     classes : int
         Number of prediction classes
@@ -33,7 +32,7 @@ def get_lenet(width, height, depth, classes):
     http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf
     """
     model = Sequential()
-    input_shape = (height, width, depth)
+    input_shape = (height, width, channels)
 
     model.add(Conv2D(20,
                      (5, 5),

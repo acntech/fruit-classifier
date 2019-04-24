@@ -1,15 +1,19 @@
 import random
-from pathlib import Path
-import cv2
+import pickle
 import numpy as np
+from pathlib import Path
+from tqdm import tqdm
 from keras.optimizers import Adam
-from keras.preprocessing.image import img_to_array
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import to_categorical
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from fruit_classifier.models.models import get_lenet
+from fruit_classifier.preprocessing.preprocessing_utils import \
+    preprocess_image
+
+from fruit_classifier.utils.image_utils import open_image
 
 
 def get_image_paths(path):
@@ -27,7 +31,7 @@ def get_image_paths(path):
         Random shuffled image paths
     """
 
-    print('[INFO] loading images...')
+    print('[INFO] Loading images...')
 
     image_paths = sorted(path.glob('**/*'))
     image_paths = [p for p in image_paths if p.is_file()]
@@ -48,7 +52,7 @@ def get_data_and_labels(image_paths):
 
     Returns
     -------
-    data : np.array, shape (len(image_paths), channels, width, height)
+    data : np.array, shape (len(image_paths), height, width, channels)
         The images as numpy array
     labels : np.array, shape (len(image_paths,)
         The corresponding labels
@@ -57,19 +61,19 @@ def get_data_and_labels(image_paths):
     data = list()
     labels = list()
     # Loop over the input images
-    for image_path in image_paths:
+    for image_path in tqdm(image_paths, desc='Loading and '
+                                             'pre-processing images'):
         # Load the image, pre-process it, and store it in the data list
-        image = cv2.imread(str(image_path))
-        image = cv2.resize(image, (28, 28))
-        image = img_to_array(image)
-        data.append(image)
+        image_array = open_image(image_path)
+        processed_image = preprocess_image(image_array)
+        data.append(processed_image)
 
         # Extract the class label from the image path and update the
         # labels list
         label = image_path.parts[-2]
         labels.append(label)
     # Scale the raw pixel intensities to the range [0, 1]
-    data = np.array(data, dtype='float') / 255.0
+    data = np.array(data, dtype='float')
     labels = np.array(labels)
 
     return data, labels
@@ -81,16 +85,16 @@ def get_model_input(data, labels):
 
     Parameters
     ----------
-    data : np.array, shape (n_images, channels, width, height)
+    data : np.array, shape (n_images, height, width, channels)
         The images as numpy array
     labels : np.array, shape (n_images,)
         The corresponding labels
 
     Returns
     -------
-    x_train : np.array, shape (n_train, channels, width, height)
+    x_train : np.array, shape (n_train, height, width, channels)
         The training data
-    x_val : np.array, shape (n_val, channels, width, height)
+    x_val : np.array, shape (n_val, height, width, channels)
         The validation data
     y_train : np.array, shape (n_train,)
         The training labels
@@ -100,7 +104,19 @@ def get_model_input(data, labels):
         Generator used for batches
     """
 
-    encoded_labels = LabelEncoder().fit_transform(labels)
+    label_encoder = LabelEncoder()
+    label_encoder.fit(labels)
+    encoded_labels = label_encoder.transform(labels)
+
+    encoder_dir =  \
+        Path(__file__).absolute().parents[1].joinpath('generated_data',
+                                                      'encoders')
+    encoder_path = encoder_dir.joinpath('encoder.pkl')
+
+    with encoder_path.open('wb') as f:
+        pickle.dump(label_encoder, f, pickle.HIGHEST_PROTOCOL)
+        print('[INFO] Saved to {}'.format(encoder_path))
+
     num_classes = len(set(labels))
 
     # Partition the data into training and testing splits using 75% of
@@ -113,6 +129,7 @@ def get_model_input(data, labels):
     # Convert the labels from integers to vectors
     y_train = to_categorical(y_train, num_classes=num_classes)
     y_val = to_categorical(y_val, num_classes=num_classes)
+
     # Construct the image generator for data augmentation
     image_generator = ImageDataGenerator(rotation_range=30,
                                          width_shift_range=0.1,
@@ -157,9 +174,9 @@ def get_model(n_classes,
 
     print('[INFO] compiling model...')
 
-    model = get_lenet(width=width,
-                      height=height,
-                      depth=channels,
+    model = get_lenet(height=height,
+                      width=width,
+                      channels=channels,
                       classes=n_classes)
 
     opt = Adam(lr=initial_learning_rate,
@@ -180,8 +197,39 @@ def train_model(model,
                 y_val,
                 batch_size=32,
                 epochs=25):
+    """
+    Trains and saves the model
 
-    print('[INFO] training network...')
+    Parameters
+    ----------
+    model : Sequential
+        The model to train
+    image_generator : ImageDataGenerator
+        The image data generator to use
+    x_train : np.array, shape (n_train, height, width, channels)
+        The training data
+    x_val : np.array, shape (n_val, height, width, channels)
+        The validation data
+    y_train : np.array, shape (n_train,)
+        The training labels
+    y_val : np.array, shape (n_val,)
+        The validation labels
+    batch_size : int
+        The batch size
+    epochs : int
+        The number of epochs
+
+    Returns
+    -------
+    history : History
+        History object containing
+        - loss
+        - val_loss
+        - acc
+        - val_acc
+    """
+
+    print('[INFO] Training network...')
 
     history = \
         model.fit_generator(image_generator.flow(x_train,
@@ -191,18 +239,20 @@ def train_model(model,
                             steps_per_epoch=len(x_train) // batch_size,
                             epochs=epochs,
                             verbose=1)
+
     # Save the model to disk
-    print('[INFO] serializing network...')
+    print('[INFO] Serializing network...')
 
     model_dir = \
-        Path(__file__).absolute().parent.joinpath('generated_data',
-                                                  'models')
+        Path(__file__).absolute().parents[1].joinpath('generated_data',
+                                                      'models')
     model_path = model_dir.joinpath('model.h5')
 
     if not model_dir.is_dir():
         model_dir.mkdir(parents=True, exist_ok=True)
 
     model.save(str(model_path))
+    print('[INFO] Saved to {}'.format(model_path))
 
     return history
 
@@ -249,3 +299,4 @@ def plot_training(history):
     plot_path = plot_dir.joinpath('training_history.png')
 
     plt.savefig(str(plot_path))
+    print('[INFO] Saved to {}'.format(plot_path))

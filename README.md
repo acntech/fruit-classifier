@@ -1,14 +1,17 @@
 # Fruit classifier
 
-> This is repo is one of the assignments given at the AI workshop on preprocessing given the 23rd of April 2019
+> This is repo is one of the assignments given at the AI workshop on 
+pre-processing given the 23rd of April 2019
 
 This assignment is loosely based on [this tutorial](https://www.pyimagesearch.com/2017/12/18/keras-deep-learning-raspberry-pi/) from `pyimagesearch`.
 
 ## Task
 
 In this assignment you have to do distinguish various kinds of fruit.
-No dataset is given, so you either have to bring your own dataset or scrape something of the internet.
-In any case you will need to clean and preprosess the data prior to model ingestion.
+No dataset is given, so you either have to bring your own dataset or 
+scrape something of the internet.
+In any case you will need to clean and pre-process the data prior to 
+model ingestion.
 
 Furthermore, you should make your own test set (a couple of photos for each class should suffice for this toy-model) based on fruit in your local vicinity (or any other object you choose to classify).
 
