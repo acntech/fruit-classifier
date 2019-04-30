@@ -2,7 +2,8 @@ import unittest
 import cv2
 from pathlib import Path
 import numpy as np
-from fruit_classifier.preprocessing.preprocessing_utils import preprocess_image
+from fruit_classifier.preprocessing.preprocessing_utils \
+    import preprocess_image
 
 
 class TestPreprocessingUtils(unittest.TestCase):
@@ -10,50 +11,36 @@ class TestPreprocessingUtils(unittest.TestCase):
     def setUp(self):
 
         test_dir = Path(__file__).absolute().parents[1]
-        self.jpg_image_file_name = test_dir.joinpath("test_data",
-                                                     "original_test_image.jpg")
-        self.png_image_file_name = test_dir.joinpath("test_data",
-                                                     "original_test_image.png")
+        self.jpg_image_file_name = test_dir.joinpath(
+            "test_data", "original_test_image.jpg")
 
-        self.test_orig_shape = [115, 73, 3]
-        self.test_orig_max = 255
-        self.test_orig_min = 0
-
+        # Correct dimensions
+        self.test_raw_shape = [115, 73, 3]
         self.test_comp_shape = [28, 28, 3]
-        self.test_comp_max = 0.00392156862745098
-        self.test_comp_min = 0.00019912376715391965
-        self.test_comp_vals = [0.00325285, 0.00281178, 0.00246107]
 
-    def test_preprocess_image(self):
-        self.preprocess(self.jpg_image_file_name)
-        self.preprocess(self.png_image_file_name)
-
-    def preprocess(self, file_name):
         # Read test image from file
-        raw = cv2.imread(str(file_name))
+        self.raw = cv2.imread(str(self.jpg_image_file_name))
 
         # Create a compressed version
-        comp = preprocess_image(raw)
+        self.comp = preprocess_image(self.raw)
+
+    def test_assert_dimensions(self):
+        # Assert that dimensions on original image are correct
+        self.assertEqual(self.raw.shape, tuple(self.test_raw_shape))
 
         # Assert that dimensions on original image are correct
-        for i in range(3):
-            self.assertEqual(np.size(raw, i), self.test_orig_shape[i])
+        self.assertEqual(self.comp.shape, tuple(self.test_comp_shape))
 
-        # Compare maximum and minimum values in original image
-        self.assertAlmostEqual(np.amax(raw), self.test_orig_max, 7)
-        self.assertAlmostEqual(np.amin(raw), self.test_orig_min, 7)
+    def test_verify_legal_max_min(self):
+        self.assertLessEqual(np.amax(self.raw), 255)
+        self.assertGreaterEqual(np.amin(self.raw), 0)
 
-        # Assert that dimensions on original image are correct
-        for i in range(3):
-            self.assertEqual(comp.shape[i], self.test_comp_shape[i])
+        self.assertLessEqual(np.amax(self.comp), 1.)
+        self.assertGreaterEqual(np.amin(self.comp), 0.)
 
-        # Compare maximum and minimum values in compressed image
-        self.assertAlmostEqual(np.amax(comp), self.test_comp_max, 7)
-        self.assertAlmostEqual(np.amin(comp), self.test_comp_min, 7)
-
-        # Compare exact values in compressed image
-        for i in range(3):
-            self.assertAlmostEqual(comp[14, 4, i], self.test_comp_vals[i], 7)
+    def test_verify_pixel_variation(self):
+        self.assertGreater(np.amax(self.raw), np.amin(self.raw))
+        self.assertGreater(np.amax(self.comp), np.amin(self.comp))
 
 
 if __name__ == '__main__':
