@@ -16,6 +16,10 @@ class TestFileUtils(unittest.TestCase):
             self.dst_path.mkdir(parents=True, exist_ok=True)
 
     def test_copytree(self):
+        self.compare_folders()
+        self.compare_folders()
+
+    def compare_folders(self):
         copytree(self.src_path, self.dst_path)
 
         self.assertTrue(self.dst_path.is_dir(), 'The copied files does not exist')
