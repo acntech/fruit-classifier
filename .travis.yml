@@ -5,7 +5,15 @@ python:
 
 install:
   - pip install -r requirements.txt
-  - pip install pytest
+  - pip install codecov pytest-cov
 
 script:
-  - pytest 
+  - pytest --cov=./
+
+# See https://docs.travis-ci.com/user/encryption-keys/
+env:
+  secure: "DDV4AC5wkNSNjUcfKC8LchCrhDHV1OjuN4TgTOP5y4i4DoJ1AHvHvnpgloBl6SjUwAA4UYiplz8gwEIkOrwd1j6hPEy1dBGC31eWoD8Q1DF4ovSQHsUcp3+WkdpHbcTcK3RY4XQwuMbVkZzwTA9GVflqe1UpRHbiOwEkSmCu1SXWIH+sLr7rrycZdEPuNzJzP8gpaKXuve8UKomHpgsPD8Bg/tGOrL9LpHBdoLebBKWbf2UqO0c9paNP9+llDYKEqEpuDuS9/A9abb8qY4tf4hdV7joSHwjXHl2XUiLtsR9nSuL36bQ7fUrPvXfwp9uQm2+5kp6pXch0bGY/rXGuRdHw1/dle1utFscwswgc74gGrswC2F9vdeuTMK6d+x8eP7Y0T29gVmrAV+NXQm0B+nPiPaNaM1eLluu2mw0s59sj37M0J1D4UMT4q83pRBomRpgiRms+he2Z0HmZ1EAkadXrK8XYW+zgIMuN8s33ERhEDVkOZwjOQYTygrruVGPZL6FNc3QBXsqjUEcoKybIBUQbkyChHWY8/5PdsSbDYS2z7s0LS43G+6zgQfNK+IuLf7Rit3Cv6E2FdjVkV3XV3wH6Tg+3P0q2ddvqQRcRL+b+Uc319lGGXXfpK72KYlI7EPtVTDG7TWVaQgoYrzAm41bQnNf1MfApgDK69JDVWrg="
+
+after_success:
+  - codecov
+
