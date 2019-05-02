@@ -1,5 +1,10 @@
 # Fruit classifier
 
+[![Build Status](https://travis-ci.org/acntech/fruit-classifier.svg?branch=master)](https://travis-ci.org/acntech/fruit-classifier.svg)
+[![codecov](https://codecov.io/gh/acntech/fruit-classifier/branch/master/graph/badge.svg)](https://codecov.io/gh/acntech/fruit-classifier)
+[![Python](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
+[![PEP8](https://img.shields.io/badge/code%20style-PEP8-brightgreen.svg)](https://www.python.org/dev/peps/pep-0008/)
+
 > This is repo is one of the assignments given at the AI workshop on
 pre-processing given the 23rd of April 2019
 
