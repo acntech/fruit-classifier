@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        # Not allowed to let coverage decrease
+	# See: https://docs.codecov.io/docs/commit-status
+        target: auto
+        threshold: null
+        base: auto
+
