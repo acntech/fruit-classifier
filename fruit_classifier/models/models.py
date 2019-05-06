@@ -45,7 +45,7 @@ def get_lenet(height, width, channels, classes):
     model.add(Conv2D(50,
                      (5, 5),
                      padding='same'))
-    model.add(MaxPooling2D(pool_size=(2, 2), 
+    model.add(MaxPooling2D(pool_size=(2, 2),
                            strides=(2, 2)))
 
     model.add(Flatten())
@@ -53,3 +53,4 @@ def get_lenet(height, width, channels, classes):
     model.add(Dense(classes, activation='softmax'))
 
     return model
+
