@@ -27,12 +27,12 @@ class TestTrainUtils(unittest.TestCase):
 
     def test_not_crashing(self):
         image_paths = get_image_paths(self.folderName)
-        self.assertGreater(image_paths, 0)
+        self.assertGreater(len(image_paths), 0)
         data, labels = get_data_and_labels(image_paths)
 
     def tearDown(self):
         folder_to_remove = self.folderName
-        folder_to_remove.rmdir()
+        shutil.rmtree(folder_to_remove)
 
 
 if __name__ == "__main__":
