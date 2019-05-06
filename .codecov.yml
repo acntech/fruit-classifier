@@ -1,3 +1,7 @@
+# NOTE: codecov needs to be installed
+#       see https://github.com/apps/codecov
+#       You also need to grant access through
+#       https://github.com/settings/applications
 codecov:
   notify:
     require_ci_to_pass: yes # require the build to pass before submitting notifications
