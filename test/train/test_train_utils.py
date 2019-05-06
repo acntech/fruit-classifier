@@ -2,6 +2,10 @@ import unittest
 from fruit_classifier.train.train_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
 from fruit_classifier.train.train_utils import get_model_input
+from fruit_classifier.train.train_utils import get_model
+from fruit_classifier.train.train_utils import train_model
+from fruit_classifier.preprocessing.preprocessing_utils import \
+    get_image_generator
 from pathlib import Path
 import shutil
 
@@ -47,6 +51,26 @@ class TestTrainUtils(unittest.TestCase):
         self.assertEqual(1, len(y_train))
         self.assertEqual(1, len(y_val))
 
+        # Test get_image_generator
+        image_generator = get_image_generator()
+        self.assertEqual(image_generator.rotation_range, 30)
+        self.assertEqual(image_generator.width_shift_range, .1)
+        self.assertEqual(image_generator.height_shift_range, .1)
+        self.assertEqual(image_generator.shear_range, .2)
+        self.assertEqual(image_generator.horizontal_flip, True)
+        self.assertEqual(image_generator.fill_mode, 'nearest')
+
+        # Test get_model
+        model = get_model(len(set(labels)), epochs = 1)
+        self.assertTrue(model._built)
+
+        history = train_model(model,
+                              image_generator,
+                              x_train,
+                              y_train,
+                              x_val,
+                              y_val)
+        self.assertEqual(history.params['epochs'], 25)
 
     def tearDown(self):
         folder_to_remove = self.folderName
