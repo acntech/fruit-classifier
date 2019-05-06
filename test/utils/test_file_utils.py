@@ -2,7 +2,6 @@ import unittest
 from pathlib import Path
 import shutil
 from fruit_classifier.utils.file_utils import copytree
-import os
 
 
 class TestFileUtils(unittest.TestCase):
@@ -12,8 +11,10 @@ class TestFileUtils(unittest.TestCase):
         self.src_path = self.root_dir.joinpath('test_data')
         self.dst_path = self.root_dir.joinpath('test_data_copy')
 
-        if not self.dst_path.is_dir():
-            self.dst_path.mkdir(parents=True, exist_ok=True)
+    def tearDown(self):
+        shutil.rmtree(self.dst_path)
+        self.assertFalse(self.dst_path.is_dir(),
+                         'The copied files was not deleted')
 
     def test_copytree(self):
         self.compare_folders()
@@ -22,20 +23,17 @@ class TestFileUtils(unittest.TestCase):
     def compare_folders(self):
         copytree(self.src_path, self.dst_path)
 
-        self.assertTrue(self.dst_path.is_dir(), 'The copied files does not exist')
+        self.assertTrue(self.dst_path.is_dir(),
+                        'The copied files does not exist')
 
-        src_files = os.listdir(self.src_path)
-        dst_files = os.listdir(self.dst_path)
+        src_files = self.src_path.glob('**/*')
+        dst_files = self.dst_path.glob('**/*')
 
-        for i, item in enumerate(src_files):
-            self.assertEqual(dst_files[i], item,
-                            msg='Copied files are not matching\n\n ' 
-                            f'{dst_files[i]} \n'
-                            f'{item}')
-
-    def tearDown(self):
-        shutil.rmtree(self.dst_path)
-        self.assertFalse(self.dst_path.is_dir(), 'The copied files was not deleted')
+        for s, d in zip(src_files, dst_files):
+            self.assertEqual(s.name, d.name,
+                             msg='Copied files are not matching\n\n ' 
+                             f'{s} \n'
+                             f'{d}')
 
 
 if __name__ == '__main__':

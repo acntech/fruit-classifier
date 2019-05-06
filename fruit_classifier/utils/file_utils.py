@@ -1,4 +1,3 @@
-import os
 import shutil
 from tqdm import tqdm
 from pathlib import Path
@@ -6,7 +5,8 @@ from pathlib import Path
 
 def copytree(src, dst, symlinks=False, ignore=None):
     """
-    Copies files from src directory to destination dst
+    Copies files from src directory to destination dst. This is a
+    workaround for shutils constraints
 
     Parameters
     ----------
@@ -27,32 +27,23 @@ def copytree(src, dst, symlinks=False, ignore=None):
     src = Path(src)
     dst = Path(dst)
 
-    for item in tqdm(os.listdir(src), desc='Copying files'):
-        s = src.joinpath(item)
-        d = dst.joinpath(item)
+    src_folder = src.parts[-1]
 
-        if s.is_dir() and not d.exists():
-            shutil.copytree(str(s), str(d), symlinks, ignore)
-        elif not d.exists():
+    if src.is_dir() and not dst.is_dir():
+        dst.mkdir()
+
+    for s in tqdm(src.glob('*'), desc='Copying file'):
+
+        if s.is_dir():
+            d = dst
+            for folder in s.parts[s.parts.index(src_folder) + 1:]:
+                d = d.joinpath(folder)
+
+            copytree(src=s, dst=d)
+
+        elif s.is_file():
+            d = dst.joinpath(s.name)
             shutil.copy2(str(s), str(d))
         else:
-            pass
+            print(f'Item is not a file or directory: {s}')
 
-    print(os.listdir(src))
-    print(os.listdir(dst))
-
-
-if __name__ == '__main__':
-    #Testing the copytree function
-
-    root_dir = Path(__file__).absolute().parents[1]
-
-    src_path = root_dir.joinpath('data_scraping')
-    dst_path = root_dir.joinpath('data_scraping_copy')
-
-    if not dst_path.is_dir():
-        dst_path.mkdir(parents=True, exist_ok=True)
-
-    copytree(src=src_path, dst=dst_path)
-
-    shutil.rmtree(dst_path)
