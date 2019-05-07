@@ -4,6 +4,25 @@ from tqdm import tqdm
 from skimage.transform import resize
 from pathlib import Path
 from fruit_classifier.utils.file_utils import copytree
+import win32api
+
+
+def truncate_file_names(raw_dir, max_file_name_length):
+    for filename in os.listdir(raw_dir):
+        if len(filename) < max_file_name_length:
+            continue
+        cut = max_file_name_length-4
+        dot_positions = filename.split(".")
+
+        # Get last element in list of dots found in file name
+        if len(dot_positions) == 0:
+            ext_start_pos = max_file_name_length-4
+        else:
+            ext_start_pos = dot_positions[-1]
+
+        extension = filename[ext_start_pos: -1]
+        print(extension)
+        #new_filename = filename[0:cut] + extension
 
 
 def remove_non_images(raw_dir, clean_dir):
@@ -18,7 +37,7 @@ def remove_non_images(raw_dir, clean_dir):
         Path for the cleaned dataset
     """
 
-    copytree(str(raw_dir), str(clean_dir))
+    copytree(raw_dir, clean_dir)
 
     # Find all image_paths
     image_paths = sorted(clean_dir.glob('**/*'))
