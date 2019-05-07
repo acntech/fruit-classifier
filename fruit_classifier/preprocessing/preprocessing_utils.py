@@ -45,7 +45,7 @@ def remove_non_images(raw_dir, clean_dir):
         Path for the cleaned dataset
     """
 
-    copytree(str(raw_dir), str(clean_dir))
+    copytree(raw_dir, clean_dir)
 
     # Find all image_paths
     image_paths = sorted(clean_dir.glob('**/*'))

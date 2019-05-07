@@ -1,11 +1,12 @@
-import os
 import shutil
 from tqdm import tqdm
+from pathlib import Path
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
     """
-    Workaround for shutils weird constraints
+    Copies files from src directory to destination dst. This is a
+    workaround for shutils constraints
 
     Parameters
     ----------
@@ -23,13 +24,26 @@ def copytree(src, dst, symlinks=False, ignore=None):
     https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
     """
 
-    src = str(src)
-    dst = str(dst)
+    src = Path(src)
+    dst = Path(dst)
 
-    for item in tqdm(os.listdir(src), desc='Copying files'):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            shutil.copytree(s, d, symlinks, ignore)
+    src_folder = src.parts[-1]
+
+    if src.is_dir() and not dst.is_dir():
+        dst.mkdir()
+
+    for s in tqdm(src.glob('*'), desc='Copying file'):
+
+        if s.is_dir():
+            d = dst
+            for folder in s.parts[s.parts.index(src_folder) + 1:]:
+                d = d.joinpath(folder)
+
+            copytree(src=s, dst=d)
+
+        elif s.is_file():
+            d = dst.joinpath(s.name)
+            shutil.copy2(str(s), str(d))
         else:
-            shutil.copy2(s, d)
+            print(f'Item is not a file or directory: {s}')
+
