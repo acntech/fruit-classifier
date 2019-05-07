@@ -4,6 +4,7 @@ from fruit_classifier.train.train_utils import get_data_and_labels
 from fruit_classifier.train.train_utils import get_model_input
 from fruit_classifier.train.train_utils import get_model
 from fruit_classifier.train.train_utils import train_model
+from fruit_classifier.train.train_utils import plot_training
 from fruit_classifier.preprocessing.preprocessing_utils import \
     get_image_generator
 from pathlib import Path
@@ -34,43 +35,73 @@ class TestTrainUtils(unittest.TestCase):
         shutil.copy(str(orig_file_path),
                     str(self.folderName.joinpath('B')))
 
-    def test_does_not_crash(self):
-        # Test get_image_paths
+        # Run get_image_paths()
         image_paths = get_image_paths(self.folderName)
-        self.assertGreater(len(image_paths), 0)
+        self.numImagePaths = len(image_paths)
 
-        # Test get_data_and_labels
+        # Run get_data_and_labels
         data, labels = get_data_and_labels(image_paths)
-        self.assertGreater(len(data), 0)
-        self.assertGreater(len(labels), 0)
+        self.numData = len(data)
+        self.numLabels = len(labels)
 
-        # Test get_model_input
+        # Run get_model_input
         x_train, x_val, y_train, y_val = get_model_input(data, labels)
-        self.assertEqual(1, len(x_train))
-        self.assertEqual(1, len(x_val))
-        self.assertEqual(1, len(y_train))
-        self.assertEqual(1, len(y_val))
+        self.num_x_train = len(x_train)
+        self.num_x_val = len(x_val)
+        self.num_y_train = len(y_train)
+        self.num_y_val = len(y_val)
 
-        # Test get_image_generator
-        image_generator = get_image_generator()
-        self.assertEqual(image_generator.rotation_range, 30)
-        self.assertEqual(image_generator.width_shift_range, .1)
-        self.assertEqual(image_generator.height_shift_range, .1)
-        self.assertEqual(image_generator.shear_range, .2)
-        self.assertEqual(image_generator.horizontal_flip, True)
-        self.assertEqual(image_generator.fill_mode, 'nearest')
+        # Run get_image_generator
+        self.image_generator = get_image_generator()
 
-        # Test get_model
-        model = get_model(len(set(labels)), epochs = 1)
-        self.assertTrue(model._built)
+        # Run get_model
+        model = get_model(len(set(labels)), epochs=1)
+        self.model_was_built = model._built
 
+        # Run train_model
         history = train_model(model,
-                              image_generator,
+                              self.image_generator,
                               x_train,
                               y_train,
                               x_val,
                               y_val)
-        self.assertEqual(history.params['epochs'], 25)
+        self.num_epochs = history.params['epochs']
+
+        # Run plot_training
+        plot_training(history)
+
+    def test_get_image_paths(self):
+        # Test get_image_paths output
+        self.assertGreater(self.numImagePaths, 0)
+
+    def test_get_data_and_labels(self):
+        # Test get_data_and_labels output
+        self.assertGreater(self.numData, 0)
+        self.assertGreater(self.numLabels, 0)
+
+    def test_get_model_input(self):
+        # Test get_model_input output
+        self.assertEqual(1, self.num_x_train)
+        self.assertEqual(1, self.num_x_val)
+        self.assertEqual(1, self.num_y_train)
+        self.assertEqual(1, self.num_y_val)
+
+    def test_image_generator(self):
+        # Test get_image_generator output
+        self.assertEqual(self.image_generator.rotation_range, 30)
+        self.assertEqual(self.image_generator.width_shift_range, .1)
+        self.assertEqual(self.image_generator.height_shift_range, .1)
+        self.assertEqual(self.image_generator.shear_range, .2)
+        self.assertEqual(self.image_generator.horizontal_flip, True)
+        self.assertEqual(self.image_generator.fill_mode, 'nearest')
+
+    def test_model(self):
+        # Test get_model output
+        self.assertTrue(self.model_was_built)
+
+    def test_train_model(self):
+        # Test train_model output
+        self.assertEqual(self.num_epochs, 25)
 
     def tearDown(self):
         folder_to_remove = self.folderName
