@@ -17,32 +17,32 @@ class TestTrainUtils(unittest.TestCase):
 
         # Select a unique folder name for a new folder
         folder_name = 'temp_folder'
-        self.folderName = test_dir.joinpath(folder_name)
-        while self.folderName.is_dir():
+        self.folder_name = test_dir.joinpath(folder_name)
+        while self.folder_name.is_dir():
             folder_name = folder_name + '_'
-            self.folderName = test_dir.joinpath(folder_name)
+            self.folder_name = test_dir.joinpath(folder_name)
 
         # Make directory and two subdirectories
-        self.folderName.mkdir(parents=True, exist_ok=True)
-        self.folderName.joinpath('A').mkdir(parents=True, exist_ok=True)
-        self.folderName.joinpath('B').mkdir(parents=True, exist_ok=True)
+        self.folder_name.mkdir(parents=True, exist_ok=True)
+        self.folder_name.joinpath('A').mkdir(parents=True, exist_ok=True)
+        self.folder_name.joinpath('B').mkdir(parents=True, exist_ok=True)
 
         # Copy an image into each of those subdirectories
         orig_file_path = test_dir.joinpath("test_data").\
             joinpath("original_test_image.jpg")
         shutil.copy(str(orig_file_path),
-                    str(self.folderName.joinpath('A')))
+                    str(self.folder_name.joinpath('A')))
         shutil.copy(str(orig_file_path),
-                    str(self.folderName.joinpath('B')))
+                    str(self.folder_name.joinpath('B')))
 
         # Run get_image_paths()
-        image_paths = get_image_paths(self.folderName)
-        self.numImagePaths = len(image_paths)
+        image_paths = get_image_paths(self.folder_name)
+        self.num_image_paths = len(image_paths)
 
         # Run get_data_and_labels
         data, labels = get_data_and_labels(image_paths)
-        self.numData = len(data)
-        self.numLabels = len(labels)
+        self.num_data = len(data)
+        self.num_labels = len(labels)
 
         # Run get_model_input
         x_train, x_val, y_train, y_val = get_model_input(data, labels)
@@ -72,12 +72,12 @@ class TestTrainUtils(unittest.TestCase):
 
     def test_get_image_paths(self):
         # Test get_image_paths output
-        self.assertGreater(self.numImagePaths, 0)
+        self.assertGreater(self.num_image_paths, 0)
 
     def test_get_data_and_labels(self):
         # Test get_data_and_labels output
-        self.assertGreater(self.numData, 0)
-        self.assertGreater(self.numLabels, 0)
+        self.assertGreater(self.num_data, 0)
+        self.assertGreater(self.num_labels, 0)
 
     def test_get_model_input(self):
         # Test get_model_input output
@@ -104,8 +104,8 @@ class TestTrainUtils(unittest.TestCase):
         self.assertEqual(self.num_epochs, 25)
 
     def tearDown(self):
-        folder_to_remove = self.folderName
-        shutil.rmtree(folder_to_remove)
+        # Delete the temporary folder its contents
+        shutil.rmtree(self.folder_name)
 
 
 if __name__ == "__main__":
