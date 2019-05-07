@@ -4,6 +4,33 @@ from tqdm import tqdm
 from skimage.transform import resize
 from pathlib import Path
 from fruit_classifier.utils.file_utils import copytree
+import os
+
+
+def truncate_filenames(raw_dir, max_name_len):
+    folder_list = os.listdir(raw_dir)
+    print("Reducing length of filenames to a maximum of " +
+          str(max_name_len) + " letters")
+
+    for folder in folder_list:
+        raw_sub_dir = raw_dir.joinpath(folder)
+        file_list = os.listdir(raw_sub_dir)
+        num_renamed = 0
+        for filename in file_list:
+            name_len = len(filename)
+            if name_len <= max_name_len:
+                continue
+            possible_types = filename.split('.')
+            file_type = possible_types[-1]
+            cut_position = max_name_len-len(file_type)-1
+            new_name = filename[0:cut_position] + '.' + file_type
+
+            old_path = raw_sub_dir.joinpath(filename)
+            new_path = raw_sub_dir.joinpath(new_name)
+            os.rename(old_path, new_path)
+            num_renamed = num_renamed + 1
+        print('Truncated ' + str(num_renamed) + ' filenames in folder '
+              + folder)
 
 
 def remove_non_images(raw_dir, clean_dir):
