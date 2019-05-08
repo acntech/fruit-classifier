@@ -3,10 +3,11 @@ from tqdm import tqdm
 from pathlib import Path
 
 
-def copytree(src, dst, symlinks=False, ignore=None):
+def copytree(src, dst):
     """
-    Copies files from src directory to destination dst. This is a
-    workaround for shutils constraints
+    Copies files from src directory to destination dst.
+
+    This is a workaround for shutils constraints
 
     Parameters
     ----------
@@ -14,10 +15,6 @@ def copytree(src, dst, symlinks=False, ignore=None):
         The source directory
     dst : Path
         The destination directory
-    symlinks : bool
-        Whether to include symlinks
-    ignore : callable
-        Function which ignores files
 
     References
     ----------
@@ -46,4 +43,3 @@ def copytree(src, dst, symlinks=False, ignore=None):
             shutil.copy2(str(s), str(d))
         else:
             print(f'Item is not a file or directory: {s}')
-
