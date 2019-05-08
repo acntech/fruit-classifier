@@ -17,8 +17,8 @@ def main():
     raw_dir = generated_data_dir.joinpath('raw_data')
     cleaned_dir = generated_data_dir.joinpath('cleaned_data')
 
-    max_name_len = 40
-    truncate_filenames(raw_dir, max_name_len)
+    # Shorten filenames if they are so long that Windows protests
+    truncate_filenames(raw_dir)
 
     if not cleaned_dir.is_dir():
         cleaned_dir.mkdir(parents=True, exist_ok=True)

@@ -7,29 +7,37 @@ from fruit_classifier.utils.file_utils import copytree
 import os
 
 
-def truncate_filenames(raw_dir, max_name_len):
+def truncate_filenames(raw_dir):
     folder_list = os.listdir(raw_dir)
-    print("Reducing length of filenames to a maximum of " +
-          str(max_name_len) + " letters")
+    print("Reducing length of filenames so that combined path to a "
+          "file is maximum 255 characters long")
+    max_windows_path_length = 255
 
     for folder in folder_list:
         raw_sub_dir = raw_dir.joinpath(folder)
+        # length of folders path + "/"
+        sub_dir_len = len(str(raw_sub_dir)) + 1
+        # length available for image file name including type
+        available_max_len = max_windows_path_length - sub_dir_len
+        # Get all files in folder
         file_list = os.listdir(raw_sub_dir)
         num_renamed = 0
         for filename in file_list:
             name_len = len(filename)
-            if name_len <= max_name_len:
+            if name_len <= available_max_len:
                 continue
+
             possible_types = filename.split('.')
             file_type = possible_types[-1]
-            cut_position = max_name_len-len(file_type)-1
+            cut_position = available_max_len - len(file_type) - 1
             new_name = filename[0:cut_position] + '.' + file_type
 
             old_path = raw_sub_dir.joinpath(filename)
             new_path = raw_sub_dir.joinpath(new_name)
+
             os.rename(old_path, new_path)
             num_renamed = num_renamed + 1
-        print('Truncated ' + str(num_renamed) + ' filenames in folder '
+        print('Truncated ' + str(num_renamed) + ' filenames in folder: '
               + folder)
 
 
