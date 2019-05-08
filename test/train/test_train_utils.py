@@ -63,7 +63,7 @@ class TestTrainUtils(unittest.TestCase):
         self.assertEqual(image_generator.fill_mode, 'nearest')
 
         # Run get_model and verify outputs
-        num_intended_epochs = 1
+        num_intended_epochs = 2
         model = get_model(len(set(labels)), epochs=num_intended_epochs)
         self.assertTrue(model._built)
 
@@ -76,7 +76,7 @@ class TestTrainUtils(unittest.TestCase):
                               y_val,
                               epochs=num_intended_epochs)
         num_epochs = history.params['epochs']
-        self.assertEqual(num_epochs, 1)
+        self.assertEqual(num_epochs, num_intended_epochs)
 
         # Run plot_training and verify it does not crash
         plot_training(history)
