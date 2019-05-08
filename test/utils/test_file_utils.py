@@ -17,23 +17,23 @@ class TestFileUtils(unittest.TestCase):
                          'The copied files was not deleted')
 
     def test_copytree(self):
-        self.compare_folders()
-        self.compare_folders()
+        # NOTE: Runs the test twice to test
+        #       1. The clean repo
+        #       2. If the test passes if files already exists in dst
+        for _ in range(2):
+            copytree(self.src_path, self.dst_path)
 
-    def compare_folders(self):
-        copytree(self.src_path, self.dst_path)
+            self.assertTrue(self.dst_path.is_dir(),
+                            'The copied files does not exist')
 
-        self.assertTrue(self.dst_path.is_dir(),
-                        'The copied files does not exist')
+            src_files = self.src_path.glob('**/*')
+            dst_files = self.dst_path.glob('**/*')
 
-        src_files = self.src_path.glob('**/*')
-        dst_files = self.dst_path.glob('**/*')
-
-        for s, d in zip(src_files, dst_files):
-            self.assertEqual(s.name, d.name,
-                             msg='Copied files are not matching\n\n ' 
-                             f'{s} \n'
-                             f'{d}')
+            for s, d in zip(src_files, dst_files):
+                self.assertEqual(s.name, d.name,
+                                 msg='Copied files are not matching\n\n' 
+                                 f'{s} \n'
+                                 f'{d}')
 
 
 if __name__ == '__main__':

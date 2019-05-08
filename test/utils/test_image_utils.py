@@ -11,10 +11,12 @@ class TestImageUtils(unittest.TestCase):
 
         test_dir = Path(__file__).absolute().parents[1]
 
-        self.jpg_image_file_name = test_dir.joinpath("test_data",
-                                                     "original_test_image.jpg")
-        self.png_image_file_name = test_dir.joinpath("test_data",
-                                                     "original_test_image.png")
+        self.jpg_image_file_name = \
+            test_dir.joinpath("test_data",
+                              "original_test_image.jpg")
+        self.png_image_file_name = \
+            test_dir.joinpath("test_data",
+                              "original_test_image.png")
 
         self.test_orig_shape = [115, 73, 3]
         self.test_orig_max = 255
@@ -27,8 +29,7 @@ class TestImageUtils(unittest.TestCase):
     def open_image_function(self, file):
         image = open_image(file)
 
-        for i in range(3):
-            self.assertEqual(self.test_orig_shape[i], image.shape[i])
+        self.assertEqual(tuple(self.test_orig_shape), image.shape)
 
         self.assertEqual(self.test_orig_max, np.amax(image))
         self.assertEqual(self.test_orig_min, np.amin(image))
