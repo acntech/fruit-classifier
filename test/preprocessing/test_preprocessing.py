@@ -59,36 +59,36 @@ class TestPreprocessingUtils(unittest.TestCase):
         '''
 
         # Select a unique folder name for a new folder
-        outer_folder_name = 'temp_folder'
-        outer_folder_path = self.test_dir.joinpath(outer_folder_name)
-        while outer_folder_path.is_dir():
-            outer_folder_name = outer_folder_name + '_'
-            outer_folder_path = self.test_dir.joinpath(outer_folder_name)
-        outer_folder_path.mkdir(parents=True, exist_ok=True)
-        inner_folder_name = outer_folder_path.joinpath('inner_folder')
-        inner_folder_name.mkdir(parents=True, exist_ok=True)
+        outer_dir_name = 'temp_dir'
+        outer_dir_path = self.test_dir.joinpath(outer_dir_name)
+        while outer_dir_path.is_dir():
+            outer_dir_name = outer_dir_name + '_'
+            outer_dir_path = self.test_dir.joinpath(outer_dir_name)
+        outer_dir_path.mkdir(parents=True, exist_ok=True)
+        inner_dir_path = outer_dir_path.joinpath('inner_dir')
+        inner_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Copy an image into this folder
-        short_image_dest_filename = inner_folder_name.\
+        short_image_dest_filename = inner_dir_path.\
             joinpath("short_image_name.jpg")
         shutil.copy(self.jpg_image_file_name, short_image_dest_filename)
 
         # Run the function to be tested
-        truncate_filenames(outer_folder_path)
+        truncate_filenames(outer_dir_path)
 
         # Extract list of files present in folder
-        file_list = os.listdir(inner_folder_name)
+        file_list = os.listdir(inner_dir_path)
 
         # Make sure the right number of files exist in that folder
         self.assertEqual(len(file_list), 1)
 
         # Make sure no path name is longer than 255 characters
         for filename in file_list:
-            filepath = inner_folder_name.joinpath(filename)
+            filepath = inner_dir_path.joinpath(filename)
             self.assertLessEqual(len(str(filepath)), 255)
 
         # Delete the temporary directory and its contents
-        shutil.rmtree(outer_folder_path)
+        shutil.rmtree(outer_dir_path)
 
 
 if __name__ == '__main__':
