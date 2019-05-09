@@ -15,75 +15,124 @@ class TestTrainUtils(unittest.TestCase):
     def setUp(self):
         test_dir = Path(__file__).absolute().parents[1]
 
-        # Select a unique folder name for a new folder
-        folder_name = 'temp_folder'
-        self.folder_name = test_dir.joinpath(folder_name)
-        while self.folder_name.is_dir():
-            folder_name = folder_name + '_'
-            self.folder_name = test_dir.joinpath(folder_name)
+        # Select a unique directory name for a new directory
+        directory_name = 'temp_directory'
+        self.directory_name = test_dir.joinpath(directory_name)
+        while self.directory_name.is_dir():
+            directory_name = directory_name + '_'
+            self.directory_name = test_dir.joinpath(directory_name)
 
         # Make directory and two subdirectories
-        self.folder_name.mkdir(parents=True, exist_ok=True)
-        self.folder_name.joinpath('A').mkdir(parents=True, exist_ok=True)
-        self.folder_name.joinpath('B').mkdir(parents=True, exist_ok=True)
+        classes = ('class_a', 'class_b')
+        self.n_classes = len(classes)
+
+        for c in classes:
+            self.directory_name.joinpath(c).mkdir(parents=True,
+                                                  exist_ok=True)
 
         # Copy an image into each of those subdirectories
         orig_file_path = test_dir.joinpath("test_data").\
             joinpath("original_test_image.jpg")
-        shutil.copy(str(orig_file_path),
-                    str(self.folder_name.joinpath('A')))
-        shutil.copy(str(orig_file_path),
-                    str(self.folder_name.joinpath('B')))
+        
+        for c in classes:
+            shutil.copy(str(orig_file_path),
+                        str(self.directory_name.joinpath(c)))
 
-    def test_train_model(self):
+        # Get the image_paths
+        self.image_paths = get_image_paths(self.directory_name)
+
+        # Set number of epochs globally
+        self.num_intended_epochs = 2
+
+    def test_get_image_paths(self):
         # Run get_image_paths() and verify outputs
-        image_paths = get_image_paths(self.folder_name)
-        num_image_paths = len(image_paths)
+        num_image_paths = len(self.image_paths)
         self.assertGreater(num_image_paths, 0)
 
+    def test_get_data_and_labels(self):
         # Run get_data_and_labels and verify outputs
-        data, labels = get_data_and_labels(image_paths)
+        data, labels = get_data_and_labels(self.image_paths)
         self.assertGreater(len(data), 0)
         self.assertGreater(len(labels), 0)
 
+    def test_get_model_input(self):
         # Run get_model_input and verify outputs
+        data, labels = get_data_and_labels(self.image_paths)
         x_train, x_val, y_train, y_val = get_model_input(data, labels)
         self.assertEqual(1, len(x_train))
         self.assertEqual(1, len(x_val))
         self.assertEqual(1, len(y_train))
         self.assertEqual(1, len(y_val))
 
+    def test_get_image_generator(self):
         # Run get_image_generator and verify outputs
-        image_generator = get_image_generator()
-        self.assertEqual(image_generator.rotation_range, 30)
-        self.assertEqual(image_generator.width_shift_range, .1)
-        self.assertEqual(image_generator.height_shift_range, .1)
-        self.assertEqual(image_generator.shear_range, .2)
-        self.assertEqual(image_generator.horizontal_flip, True)
-        self.assertEqual(image_generator.fill_mode, 'nearest')
+        rotation_range = 30
+        width_shift_range = 0.1
+        height_shift_range = 0.1
+        shear_range = 0.2
+        zoom_range = 0.2
+        horizontal_flip = True
+        fill_mode = 'nearest'
 
+        image_generator = \
+            get_image_generator(rotation_range=rotation_range,
+                                width_shift_range=width_shift_range,
+                                height_shift_range=height_shift_range,
+                                shear_range=shear_range,
+                                zoom_range=zoom_range)
+
+        self.assertEqual(image_generator.rotation_range, rotation_range)
+        self.assertEqual(image_generator.width_shift_range,
+                         width_shift_range)
+        self.assertEqual(image_generator.height_shift_range,
+                         height_shift_range)
+        self.assertEqual(image_generator.shear_range,
+                         shear_range)
+        self.assertEqual(image_generator.horizontal_flip,
+                         horizontal_flip)
+        self.assertEqual(image_generator.fill_mode,
+                         fill_mode)
+
+    def test_get_model(self):
         # Run get_model and verify outputs
-        num_intended_epochs = 2
-        model = get_model(len(set(labels)), epochs=num_intended_epochs)
+        model = get_model(self.n_classes,
+                          epochs=self.num_intended_epochs)
         self.assertTrue(model._built)
 
+    def test_train_model(self):
         # Run train_model and verify outputs
+        data, labels = get_data_and_labels(self.image_paths)
+        x_train, x_val, y_train, y_val = get_model_input(data, labels)
+        image_generator = get_image_generator()
+
+        model = get_model(self.n_classes,
+                          epochs=self.num_intended_epochs)
+
         history = train_model(model,
                               image_generator,
                               x_train,
                               y_train,
                               x_val,
                               y_val,
-                              epochs=num_intended_epochs)
+                              epochs=self.num_intended_epochs)
         num_epochs = history.params['epochs']
-        self.assertEqual(num_epochs, num_intended_epochs)
+        self.assertEqual(num_epochs, self.num_intended_epochs)
 
+    def test_plot_training(self):
         # Run plot_training and verify it does not crash
+        class History(object):
+            pass
+
+        history = History
+        history.history = dict(loss=(1, 2),
+                               val_loss=(1, 2),
+                               acc=(1, 2),
+                               val_acc=(1, 2),)
         plot_training(history)
 
     def tearDown(self):
-        # Delete the temporary folder its contents
-        shutil.rmtree(self.folder_name)
+        # Delete the temporary directory its contents
+        shutil.rmtree(self.directory_name)
 
 
 if __name__ == "__main__":
