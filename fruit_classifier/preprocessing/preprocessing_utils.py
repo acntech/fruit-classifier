@@ -8,6 +8,10 @@ import os
 
 
 def truncate_filenames(raw_dir):
+    # Assumes raw_dir is a directory that contains ONLY directories,
+    # in which all files/folders will be truncated if their total
+    # path length is more than 255 characters.
+
     folder_list = os.listdir(raw_dir)
     print("Reducing length of filenames so that combined path to a "
           "file is maximum 255 characters long")
