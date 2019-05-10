@@ -10,8 +10,9 @@ def mocked_googleimagesdownload():
         def __init__(self):
             pass
 
-        def download(self, arguments):
-            return 'nothing'
+        @staticmethod
+        def download(_):
+            return _
 
     return MockGoogleimagesdownload()
 
@@ -23,7 +24,8 @@ class TestDataScraping(unittest.TestCase):
         self.destination_dir = self.root_dir.joinpath('generated_data',
                                                       'raw_data')
 
-    @patch("google_images_download.google_images_download.googleimagesdownload",
+    @patch("google_images_download.google_images_download."
+           "googleimagesdownload",
            side_effect=mocked_googleimagesdownload)
     def test_main(self, mock_download):
         main()
