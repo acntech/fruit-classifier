@@ -69,9 +69,32 @@ def preprocess_image(image):
     return preprocessed_image
 
 
-def get_image_generator():
+def get_image_generator(rotation_range=30,
+                        width_shift_range=0.1,
+                        height_shift_range=0.1,
+                        shear_range=0.2,
+                        zoom_range=0.2,
+                        horizontal_flip=True,
+                        fill_mode='nearest'):
     """
     Returns the image generator
+
+    Parameters
+    ----------
+    rotation_range : int
+        Degree range for random rotations
+    width_shift_range : float
+        Fraction of total width, if < 1, or pixels if >= 1
+    height_shift_range : float
+        Fraction of total height, if < 1, or pixels if >= 1
+    shear_range : float
+        Shear intensity
+    zoom_range : float
+        Range for random zoom
+    horizontal_flip : bool
+        Randomly flip inputs horizontally
+    fill_mode : ["constant"|"nearest"|"reflect"|"wrap"]
+        How points outside the boundaries of the input should be filled
 
     Returns
     -------
@@ -79,12 +102,13 @@ def get_image_generator():
         Generator used for batches
     """
 
-    image_generator = ImageDataGenerator(rotation_range=30,
-                                         width_shift_range=0.1,
-                                         height_shift_range=0.1,
-                                         shear_range=0.2,
-                                         zoom_range=0.2,
-                                         horizontal_flip=True,
-                                         fill_mode='nearest')
+    image_generator =\
+        ImageDataGenerator(rotation_range=rotation_range,
+                           width_shift_range=width_shift_range,
+                           height_shift_range=height_shift_range,
+                           shear_range=shear_range,
+                           zoom_range=zoom_range,
+                           horizontal_flip=horizontal_flip,
+                           fill_mode=fill_mode)
 
     return image_generator
