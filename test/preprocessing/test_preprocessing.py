@@ -3,7 +3,6 @@ import cv2
 from pathlib import Path
 import numpy as np
 import shutil
-import os
 from fruit_classifier.preprocessing.preprocessing_utils \
     import truncate_filenames
 from fruit_classifier.preprocessing.preprocessing_utils \
@@ -47,8 +46,10 @@ class TestPreprocessingUtils(unittest.TestCase):
         self.assertGreater(np.amax(self.comp), np.amin(self.comp))
 
     def test_truncate_filenames(self):
-        '''
-        This test creates a folder structure with an image in it,
+        """
+        Test that truncate_filenames does not crash
+
+        This test creates a directory structure with an image in it,
         truncates filenames inside it, and basically checks that it
         does not crash.
 
@@ -56,9 +57,9 @@ class TestPreprocessingUtils(unittest.TestCase):
         run truncate_filenames, and check that the filename now is
         sufficiently short. However, it was hard to create a file wih
         long filename, so I did not spend more time on this.
-        '''
+        """
 
-        # Select a unique folder name for a new folder
+        # Select a unique directory name for a new directory
         outer_dir_name = 'temp_dir'
         outer_dir_path = self.test_dir.joinpath(outer_dir_name)
         while outer_dir_path.is_dir():
@@ -68,7 +69,7 @@ class TestPreprocessingUtils(unittest.TestCase):
         inner_dir_path = outer_dir_path.joinpath('inner_dir')
         inner_dir_path.mkdir(parents=True, exist_ok=True)
 
-        # Copy an image into this folder
+        # Copy an image into this directory
         short_image_dest_filename = inner_dir_path.\
             joinpath("short_image_name.jpg")
         shutil.copy(self.jpg_image_file_name, short_image_dest_filename)
@@ -76,15 +77,14 @@ class TestPreprocessingUtils(unittest.TestCase):
         # Run the function to be tested
         truncate_filenames(outer_dir_path)
 
-        # Extract list of files present in folder
-        file_list = os.listdir(inner_dir_path)
+        # Extract list of files present in directory
+        file_list = list(Path(inner_dir_path).glob('*'))
 
-        # Make sure the right number of files exist in that folder
+        # Make sure the right number of files exist in that directory
         self.assertEqual(len(file_list), 1)
 
         # Make sure no path name is longer than 255 characters
-        for filename in file_list:
-            filepath = inner_dir_path.joinpath(filename)
+        for filepath in file_list:
             self.assertLessEqual(len(str(filepath)), 255)
 
         # Delete the temporary directory and its contents
