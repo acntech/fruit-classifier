@@ -1,40 +1,36 @@
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import patch
+from fruit_classifier.data_scraping.__main__ import main
 from pathlib import Path
+
+
+def mocked_googleimagesdownload():
+
+    class MockGoogleimagesdownload:
+        def __init__(self):
+            pass
+
+        def download(self, arguments):
+            return 'nothing'
+
+    return MockGoogleimagesdownload()
 
 
 class TestDataScraping(unittest.TestCase):
 
     def setUp(self):
         self.root_dir = Path(__file__).absolute().parents[2]
-        self.limit = 3
-        self.categories = ('bananas', 'apples')
+        self.destination_dir = self.root_dir.joinpath('generated_data',
+                                                      'raw_data')
 
-    @patch('fruit_classifier.data_scraping.__main__.main',
-           return_value=Path(__file__).absolute().parents[2].joinpath(
-                                                           'test',
-                                                           'test_data',
-                                                           'raw_data'))
-    def test_main(self, mocked_main):
-        self.data_dir = mocked_main(categories=self.categories,
-                                    limit=self.limit)
+    @patch("google_images_download.google_images_download.googleimagesdownload",
+           side_effect=mocked_googleimagesdownload)
+    def test_main(self, mock_download):
+        main()
 
-        # Check that the function was called once with the correct
-        # parameters
-        mocked_main.assert_called_once_with(
-                                    categories=('bananas', 'apples'),
-                                    limit=3)
+        mock_download.assert_called_once()
+        self.assertTrue(self.destination_dir.is_dir())
 
-        # Check that all folders and files exist and the amount
-        # is correct
-        self.assertIsNotNone(True, msg='Image folder is empty')
-        self.assertTrue(self.data_dir.joinpath('bananas').is_dir())
-        self.assertTrue(self.data_dir.joinpath('apples').is_dir())
 
-        for cat in self.categories:
-            count = 0
-
-            for i, file in enumerate(self.data_dir.joinpath(cat).glob('*')):
-                self.assertTrue(file.is_file())
-                count = i+1
-            self.assertEqual(count, self.limit)
+if __name__ == '__main__':
+    unittest.main()
