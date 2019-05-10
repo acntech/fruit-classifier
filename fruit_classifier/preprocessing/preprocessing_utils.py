@@ -4,7 +4,6 @@ from tqdm import tqdm
 from skimage.transform import resize
 from pathlib import Path
 from fruit_classifier.utils.file_utils import copytree
-import os
 
 
 def truncate_filenames(raw_dir):
@@ -12,37 +11,38 @@ def truncate_filenames(raw_dir):
     # in which all files/folders will be truncated if their total
     # path length is more than 255 characters.
 
-    folder_list = os.listdir(raw_dir)
+    subdirectory_list = [p for p in Path(raw_dir).glob('*')
+                         if p.is_dir()]
     print("Reducing length of filenames so that combined path to a "
           "file is maximum 255 characters long")
     max_windows_path_length = 255
 
-    for folder in folder_list:
-        raw_sub_dir = raw_dir.joinpath(folder)
+    for sub_dir_path in subdirectory_list:
+
         # length of folders path + "/"
-        sub_dir_len = len(str(raw_sub_dir)) + 1
+        sub_dir_len = len(str(sub_dir_path)) + 1
         # length available for image file name including type
         available_max_len = max_windows_path_length - sub_dir_len
         # Get all files in folder
-        file_list = os.listdir(raw_sub_dir)
+        file_list = list(Path(sub_dir_path).glob('*'))
         num_renamed = 0
-        for filename in file_list:
-            name_len = len(filename)
-            if name_len <= available_max_len:
+        for filepath in file_list:
+            filename = filepath.name
+            file_path_len = len(filename)
+            if file_path_len <= max_windows_path_length:
                 continue
-
             possible_types = filename.split('.')
             file_type = possible_types[-1]
             cut_position = available_max_len - len(file_type) - 1
             new_name = filename[0:cut_position] + '.' + file_type
 
-            old_path = raw_sub_dir.joinpath(filename)
-            new_path = raw_sub_dir.joinpath(new_name)
+            old_path = sub_dir_path.joinpath(filename)
+            new_path = sub_dir_path.joinpath(new_name)
 
-            os.rename(old_path, new_path)
+            Path.rename(old_path, new_path)
             num_renamed = num_renamed + 1
         print('Truncated ' + str(num_renamed) + ' filenames in folder: '
-              + folder)
+              + str(sub_dir_path.name))
 
 
 def remove_non_images(raw_dir, clean_dir):
