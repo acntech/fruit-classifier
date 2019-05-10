@@ -52,20 +52,21 @@ class TestPreprocessingUtils(unittest.TestCase):
         This test creates a directory structure with an image in it,
         truncates filenames inside it, and basically checks that it
         does not crash.
-
-        Ideally, this test would create a file with too long filename,
-        run truncate_filenames, and check that the filename now is
-        sufficiently short. However, it was hard to create a file wih
-        long filename, so I did not spend more time on this.
         """
 
         # Select a unique directory name for a new directory
         outer_dir_name = 'temp_dir'
-        outer_dir_path = self.test_dir.joinpath(outer_dir_name)
-        while outer_dir_path.is_dir():
-            outer_dir_name = outer_dir_name + '_'
-            outer_dir_path = self.test_dir.joinpath(outer_dir_name)
-        outer_dir_path.mkdir(parents=True, exist_ok=True)
+
+        # Make a dir of this name
+        duplicate_dir_path = self.test_dir.joinpath(outer_dir_name)
+        duplicate_dir_path.mkdir(parents=True, exist_ok=True)
+
+        # Try duplicating this dir, forcing a the addition of a '_' in
+        # the new directory's name
+        outer_dir_path = self.create_new_directory(outer_dir_name)
+
+        # Create an inner directory, to  mimic the directory structure
+        # that truncate_filenames() requires.
         inner_dir_path = outer_dir_path.joinpath('inner_dir')
         inner_dir_path.mkdir(parents=True, exist_ok=True)
 
@@ -75,6 +76,8 @@ class TestPreprocessingUtils(unittest.TestCase):
         shutil.copy(self.jpg_image_file_name, short_image_dest_filename)
 
         # Run the function to be tested
+        # No files should be truncated, unless this directory's path is
+        # long in terms of characters (windows API allows max 260)
         truncate_filenames(outer_dir_path)
 
         # Extract list of files present in directory
@@ -89,6 +92,30 @@ class TestPreprocessingUtils(unittest.TestCase):
 
         # Delete the temporary directory and its contents
         shutil.rmtree(outer_dir_path)
+        shutil.rmtree(duplicate_dir_path)
+
+    def create_new_directory(self, outer_dir_name):
+        """
+        Creates a directory with a unique name based on outer_dir_name
+
+        If outer_dir_name exists, it adds underscores untill
+        the directory name is unique
+
+        Parameters
+        ----------
+        outer_dir_name: Base for name of new directory
+
+        Returns
+        -------
+        outer_dir_path: The final directory path
+
+        """
+        outer_dir_path = self.test_dir.joinpath(outer_dir_name)
+        while outer_dir_path.is_dir():
+            outer_dir_name = outer_dir_name + '_'
+            outer_dir_path = self.test_dir.joinpath(outer_dir_name)
+        outer_dir_path.mkdir(parents=True, exist_ok=True)
+        return outer_dir_path
 
 
 if __name__ == '__main__':

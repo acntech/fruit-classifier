@@ -8,14 +8,16 @@ from fruit_classifier.utils.file_utils import copytree
 
 def truncate_filenames(raw_dir):
     """
+    Truncate file names so path length <= 255 characters
+
+    Assumes raw_dir is a directory that contains ONLY directories,
+    in which all files/directories will be truncated if their total
+    path length is more than 255 characters.
 
     Parameters
     ----------
     raw_dir: Will truncate files in raw_dir's subfolders
 
-      # Assumes raw_dir is a directory that contains ONLY directories,
-      # in which all files/directories will be truncated if their total
-      # path length is more than 255 characters.
     """
 
     subdirectory_list = [p for p in Path(raw_dir).glob('*')
