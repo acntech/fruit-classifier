@@ -2,8 +2,8 @@ matplotlib==3.0.3
 google_images_download==2.5.1
 numpy==1.16.2
 keras==2.2.4
-scikit_image==0.15.0
-scikit_learn==0.20.3
+scikit-image==0.15.0
+scikit-learn==0.20.3
 opencv-python==4.1.0.25
 tqdm==4.31.1
 tensorflow==1.13.1
