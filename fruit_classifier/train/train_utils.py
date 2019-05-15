@@ -289,6 +289,7 @@ def plot_training(history):
         - val_acc
     """
 
+
     plt.style.use('ggplot')
     plt.figure()
     n_epochs = np.arange(0, len(history.history['loss']))
@@ -304,6 +305,7 @@ def plot_training(history):
     plt.xlabel('Epoch #')
     plt.ylabel('Loss/Accuracy')
     plt.legend(loc='lower left')
+    plt.show()
 
     plot_dir = \
         Path(__file__).absolute().parents[2].joinpath('generated_data',
