@@ -40,8 +40,9 @@ the code in `fruit_classifier/preprocessing.`
 3. Scrape images with `python -m fruit_classifier.data_scraping`
 4. Clean the data with `python -m fruit_classifier.preprocessing`
 5. Train with `python -m fruit_classifier.train`
-6. Predict with `python -m fruit_classifier.predict -i <path_to_image>`
- 
+6. Predict random image with `python -m fruit_classifier.predict`
+   Predict specific image with `python -m fruit_classifier.predict -i <path_to_image>`
+   
    Example: 
    `python -m fruit_classifier.predict -i "test\test_data\raw_data\bananas\1. banana-1.png"`
 
