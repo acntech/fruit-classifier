@@ -8,9 +8,11 @@ from fruit_classifier.predict.predict_utils import load_classifier
 from fruit_classifier.utils.image_utils import open_image
 from fruit_classifier.preprocessing.preprocessing_utils import \
     preprocess_image
+import random
+from pathlib import Path
 
 
-def main(image_path):
+def main(image_path=''):
     """
     Predict the class of an image
 
@@ -19,6 +21,23 @@ def main(image_path):
     image_path : str
         The image path as a string
     """
+
+    if image_path == '':
+        generated_data_dir = \
+            Path(__file__).absolute().parents[2].joinpath(
+                'generated_data')
+        cleaned_dir = generated_data_dir.joinpath('cleaned_data')
+        p = Path(cleaned_dir)
+        random_folder = random.choice(
+            [x for x in p.iterdir() if x.is_dir()])
+        sub_dir = cleaned_dir.joinpath(random_folder)
+
+        f = Path(sub_dir)
+        random_image = random.choice(
+            [x for x in f.iterdir()])
+        image_path = random_image
+
+
 
     # Load the image
     image = open_image(Path(image_path))
@@ -49,12 +68,13 @@ def main(image_path):
 
 if __name__ == '__main__':
     # Construct the argument parse and parse the arguments
-    parser = argparse.ArgumentParser(description='Predict the class '
-                                                 'of an image')
-    parser.add_argument('-i',
-                        '--image',
-                        required=True,
-                        help='Path to input image')
-    args = parser.parse_args()
+    #parser = argparse.ArgumentParser(description='Predict the class '
+    #                                             'of an image')
+    #parser.add_argument('-i',
+    #                    '--image',
+    #                    required=True,
+    #                    help='Path to input image')
+    #args = parser.parse_args()
 
-    main(args.image)
+    #main(args.image)
+    main()
