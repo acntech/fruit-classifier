@@ -16,6 +16,7 @@ class TestPreprocessingUtils(unittest.TestCase):
         self.test_dir = Path(__file__).absolute().parents[1]
         self.jpg_image_file_name = self.test_dir.joinpath(
             "test_data", "original_test_image.jpg")
+        self.tmp_dir_path = self.test_dir.joinpath('tmp_dir')
 
         # Correct dimensions
         self.test_raw_shape = [115, 73, 3]
@@ -26,6 +27,12 @@ class TestPreprocessingUtils(unittest.TestCase):
 
         # Create a compressed version
         self.comp = preprocess_image(self.raw)
+
+    def tearDown(self):
+        # Tear down the tmp_dir if it has been created
+        if self.tmp_dir_path.is_dir():
+            # Delete the temporary directory and its contents
+            shutil.rmtree(self.tmp_dir_path)
 
     def test_assert_dimensions(self):
         # Assert that dimensions on original image are correct
@@ -54,20 +61,12 @@ class TestPreprocessingUtils(unittest.TestCase):
         does not crash.
         """
 
-        # Select a unique directory name for a new directory
-        outer_dir_name = 'temp_dir'
-
         # Make a dir of this name
-        duplicate_dir_path = self.test_dir.joinpath(outer_dir_name)
-        duplicate_dir_path.mkdir(parents=True, exist_ok=True)
-
-        # Try duplicating this dir, forcing a the addition of a '_' in
-        # the new directory's name
-        outer_dir_path = self.create_new_directory(outer_dir_name)
+        self.tmp_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Create an inner directory, to  mimic the directory structure
         # that truncate_filenames() requires.
-        inner_dir_path = outer_dir_path.joinpath('inner_dir')
+        inner_dir_path = self.tmp_dir_path.joinpath('inner_dir')
         inner_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Copy an image into this directory
@@ -78,7 +77,7 @@ class TestPreprocessingUtils(unittest.TestCase):
         # Run the function to be tested
         # No files should be truncated, unless this directory's path is
         # long in terms of characters (windows API allows max 260)
-        truncate_filenames(outer_dir_path)
+        truncate_filenames(self.tmp_dir_path)
 
         # Extract list of files present in directory
         file_list = list(Path(inner_dir_path).glob('*'))
@@ -89,33 +88,6 @@ class TestPreprocessingUtils(unittest.TestCase):
         # Make sure no path name is longer than 255 characters
         for filepath in file_list:
             self.assertLessEqual(len(str(filepath)), 255)
-
-        # Delete the temporary directory and its contents
-        shutil.rmtree(outer_dir_path)
-        shutil.rmtree(duplicate_dir_path)
-
-    def create_new_directory(self, outer_dir_name):
-        """
-        Creates a directory with a unique name based on outer_dir_name
-
-        If outer_dir_name exists, it adds underscores untill
-        the directory name is unique
-
-        Parameters
-        ----------
-        outer_dir_name: Base for name of new directory
-
-        Returns
-        -------
-        outer_dir_path: The final directory path
-
-        """
-        outer_dir_path = self.test_dir.joinpath(outer_dir_name)
-        while outer_dir_path.is_dir():
-            outer_dir_name = outer_dir_name + '_'
-            outer_dir_path = self.test_dir.joinpath(outer_dir_name)
-        outer_dir_path.mkdir(parents=True, exist_ok=True)
-        return outer_dir_path
 
 
 if __name__ == '__main__':
