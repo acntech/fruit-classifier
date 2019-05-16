@@ -125,6 +125,6 @@ def pick_random_image(from_folder):
     sub_dir = cleaned_dir.joinpath(random_folder)
     f = Path(sub_dir)
     random_image = random.choice(
-        [x for x in f.iterdir()])
+        [x for x in f.iterdir() if not x.is_dir()])
     image_path = random_image
     return image_path

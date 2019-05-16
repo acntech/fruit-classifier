@@ -6,7 +6,8 @@ from fruit_classifier.predict.predict_utils import pick_random_image
 
 class TestPredictUtils(unittest.TestCase):
     def setUp(self):
-        self.testDir = Path(__file__).absolute().parents[1]
+        self.testDir = Path(__file__).absolute().parents[1].\
+            joinpath('test_data')
 
     def test_pick_random_image(self):
         image_path = pick_random_image(self.testDir)
