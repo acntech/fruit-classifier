@@ -6,9 +6,12 @@ from keras.engine.saving import load_model
 from skimage.transform import resize
 
 
-def draw_text_with_background(output_image, text="text",
-                              text_offset_x=10, text_offset_y=25,
-                              font_scale=.7, font_thickness=2,
+def draw_text_with_background(output_image,
+                              text="text",
+                              text_offset_x=10,
+                              text_offset_y=25,
+                              font_scale=.7,
+                              font_thickness=2,
                               font_color=(0, 0, 0),
                               font_bg_color=(255, 255, 255),
                               font=cv2.FONT_HERSHEY_SIMPLEX,
