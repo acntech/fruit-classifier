@@ -3,12 +3,12 @@ import cv2
 import numpy as np
 from pathlib import Path
 from fruit_classifier.predict.predict_utils import draw_class_on_image
+from fruit_classifier.predict.predict_utils import pick_random_image
 from fruit_classifier.predict.predict_utils import classify
 from fruit_classifier.predict.predict_utils import load_classifier
 from fruit_classifier.utils.image_utils import open_image
 from fruit_classifier.preprocessing.preprocessing_utils import \
     preprocess_image
-import random
 
 
 def main(image_path=''):
@@ -22,21 +22,7 @@ def main(image_path=''):
     """
 
     if image_path == '':
-        generated_data_dir = \
-            Path(__file__).absolute().parents[2].joinpath(
-                'generated_data')
-        cleaned_dir = generated_data_dir.joinpath('cleaned_data')
-        p = Path(cleaned_dir)
-        random_folder = random.choice(
-            [x for x in p.iterdir() if x.is_dir()])
-        sub_dir = cleaned_dir.joinpath(random_folder)
-
-        f = Path(sub_dir)
-        random_image = random.choice(
-            [x for x in f.iterdir()])
-        image_path = random_image
-
-
+        image_path = pick_random_image(from_folder='cleaned_data')
 
     # Load the image
     image = open_image(Path(image_path))

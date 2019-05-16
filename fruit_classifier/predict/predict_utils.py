@@ -1,4 +1,6 @@
 import pickle
+import random
+
 import cv2
 import numpy as np
 from pathlib import Path
@@ -96,3 +98,19 @@ def load_classifier():
     model = load_model(str(model_path))
 
     return model
+
+
+def pick_random_image(from_folder):
+    generated_data_dir = \
+        Path(__file__).absolute().parents[2].joinpath(
+            'generated_data')
+    cleaned_dir = generated_data_dir.joinpath(from_folder)
+    p = Path(cleaned_dir)
+    random_folder = random.choice(
+        [x for x in p.iterdir() if x.is_dir()])
+    sub_dir = cleaned_dir.joinpath(random_folder)
+    f = Path(sub_dir)
+    random_image = random.choice(
+        [x for x in f.iterdir()])
+    image_path = random_image
+    return image_path
