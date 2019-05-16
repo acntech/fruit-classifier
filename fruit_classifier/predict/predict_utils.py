@@ -104,6 +104,8 @@ def pick_random_image(from_folder):
     """
     Picks a random image from a random directory in "from_folder"
 
+    Note, this includes images from both training set and test set.
+
     Parameters
     ----------
     from_folder : str - the folder where an image is found
