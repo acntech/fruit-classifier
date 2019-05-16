@@ -101,6 +101,18 @@ def load_classifier():
 
 
 def pick_random_image(from_folder):
+    """
+    Picks a random image from a random directory in "from_folder"
+
+    Parameters
+    ----------
+    from_folder : str - the folder where an image is found
+
+    Returns
+    -------
+    image_path : str - the path to the image
+
+    """
     generated_data_dir = \
         Path(__file__).absolute().parents[2].joinpath(
             'generated_data')
