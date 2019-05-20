@@ -107,11 +107,13 @@ def pick_random_image(from_directory):
     Parameters
     ----------
     from_directory : str
-        the directory where an image is found
+        The directory where an image is found
 
     Returns
     -------
-    image_path : str - the path to the image
+    image_path : str
+        the path to the image
+
     """
     generated_data_dir = \
         Path(__file__).absolute().parents[2].joinpath(
