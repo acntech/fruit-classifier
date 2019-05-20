@@ -108,7 +108,8 @@ def pick_random_image(from_folder):
 
     Parameters
     ----------
-    from_folder : str - the folder where an image is found
+    from_folder : str
+        The directory where an image is found
 
     Returns
     -------
