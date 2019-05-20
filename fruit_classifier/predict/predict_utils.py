@@ -23,14 +23,14 @@ def draw_text_with_background(output_image,
     ----------
     output_image    : cv2 image -  The image
     text            : str - The text
-    text_offset_x   : integer - text start position x axis
-    text_offset_y   : integer - text start position y axis
-    font_scale      : integer - font scale used
-    font_thickness  : integer - font thickness used
-    font_color      : integer array - text color
-    font_bg_color   : integer array - background box color
+    text_offset_x   : int - text start position x axis
+    text_offset_y   : int - text start position y axis
+    font_scale      : int - font scale used
+    font_thickness  : int - font thickness used
+    font_color      : int array - text color
+    font_bg_color   : int array - background box color
     font            : cv2 font - font of text
-    padding         : integer - margin of the box around text
+    padding         : int - margin of the box around text
     """
 
     # get the width and height of the text box from the text
