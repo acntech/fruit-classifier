@@ -113,7 +113,8 @@ def pick_random_image(from_folder):
 
     Returns
     -------
-    image_path : str - the path to the image
+    image_path : str 
+        the path to the image
 
     """
     generated_data_dir = \
