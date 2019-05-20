@@ -21,7 +21,8 @@ def draw_text_with_background(output_image,
 
     Parameters
     ----------
-    output_image    : cv2 image -  The image
+    output_image : cv2
+        The image
     text            : str - The text
     text_offset_x   : int - text start position x axis
     text_offset_y   : int - text start position y axis
