@@ -1,6 +1,5 @@
 import pickle
 import random
-
 import cv2
 import numpy as np
 from pathlib import Path
@@ -89,7 +88,6 @@ def load_classifier():
     model : Sequential
         The model to classify from
     """
-
     print('[INFO] loading network...')
     model_dir = \
         Path(__file__).absolute().parents[2].joinpath('generated_data',
@@ -100,31 +98,30 @@ def load_classifier():
     return model
 
 
-def pick_random_image(from_folder):
+def pick_random_image(from_directory):
     """
-    Picks a random image from a random directory in "from_folder"
+    Picks a random image from a random directory in "from_directory"
 
     Note, this includes images from both training set and test set.
 
     Parameters
     ----------
-    from_folder : str - the folder where an image is found
+    from_directory : str
+        the directory where an image is found
 
     Returns
     -------
     image_path : str - the path to the image
-
     """
     generated_data_dir = \
         Path(__file__).absolute().parents[2].joinpath(
             'generated_data')
-    cleaned_dir = generated_data_dir.joinpath(from_folder)
-    p = Path(cleaned_dir)
-    random_folder = random.choice(
+    image_dir = generated_data_dir.joinpath(from_directory)
+    p = Path(image_dir)
+    random_directory = random.choice(
         [x for x in p.iterdir() if x.is_dir()])
-    sub_dir = cleaned_dir.joinpath(random_folder)
+    sub_dir = image_dir.joinpath(random_directory)
     f = Path(sub_dir)
-    random_image = random.choice(
+    image_path = random.choice(
         [x for x in f.iterdir() if not x.is_dir()])
-    image_path = random_image
     return image_path
