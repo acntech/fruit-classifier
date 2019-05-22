@@ -7,3 +7,5 @@ scikit_learn==0.20.3
 opencv-python==4.1.0.25
 tqdm==4.31.1
 tensorflow==1.13.1
+flask==1.0.2
+werkzeug==0.15.4

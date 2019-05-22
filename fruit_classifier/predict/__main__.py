@@ -11,7 +11,7 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
     preprocess_image
 
 
-def main(image_path=''):
+def main(image_path='', show_image=False):
     """
     Predict the class of an image
 
@@ -19,6 +19,13 @@ def main(image_path=''):
     ----------
     image_path : str
         The image path as a string
+    show_image : bool
+        Whether or not to use cv2.imshow to display the image
+
+    Returns
+    -------
+    output : np.array, shape (height, width, channels)
+        The original image annotated with the class label and confidence
     """
 
     if image_path == '':
@@ -46,9 +53,12 @@ def main(image_path=''):
     # Draw the label on the image
     output = draw_class_on_image(orig, probability_text)
 
-    # Show the output image
-    cv2.imshow('Output', output)
-    cv2.waitKey(0)
+    if show_image:
+        # Show the output image
+        cv2.imshow('Output', output)
+        cv2.waitKey(0)
+
+    return output
 
 
 if __name__ == '__main__':
@@ -62,5 +72,5 @@ if __name__ == '__main__':
                         default='')
     args = parser.parse_args()
 
-    main(args.image)
-    main()
+    main(args.image, show_image=True)
+    # main()
