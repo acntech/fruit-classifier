@@ -3,8 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Excecutables
+*.exe
+
 # C extensions
 *.so
+
+# Ignore exe files
+*.exe
 
 # Distribution / packaging
 .Python

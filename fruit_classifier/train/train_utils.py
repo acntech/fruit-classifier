@@ -277,7 +277,7 @@ def plot_training(history):
     """
     Plots the training loss and accuracy
 
-    The plot is saved in the 'plot' directory
+    The plot is saved in the 'generated_data/plots' directory
 
     Parameters
     ----------
@@ -288,7 +288,6 @@ def plot_training(history):
         - acc
         - val_acc
     """
-
 
     plt.style.use('ggplot')
     plt.figure()
@@ -305,7 +304,6 @@ def plot_training(history):
     plt.xlabel('Epoch #')
     plt.ylabel('Loss/Accuracy')
     plt.legend(loc='lower left')
-    plt.show()
 
     plot_dir = \
         Path(__file__).absolute().parents[2].joinpath('generated_data',
