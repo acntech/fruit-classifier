@@ -1,0 +1,10 @@
+.git
+.pytest_cache
+.DS_Store
+chromedriver*
+docker/
+generated_data/
+
+# Unignore the encoders and models
+!generated_data/encoders
+!generated_data/models

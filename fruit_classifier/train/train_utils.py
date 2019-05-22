@@ -277,7 +277,7 @@ def plot_training(history):
     """
     Plots the training loss and accuracy
 
-    The plot is saved in the 'plot' directory
+    The plot is saved in the 'generated_data/plots' directory
 
     Parameters
     ----------
