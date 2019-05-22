@@ -1,0 +1,11 @@
+<!doctype html>
+<title>Classify</title>
+
+<p><img src="data:;base64,{{ result_b64 }}" alt="Nice image"><p>
+<p>That's surely a nice prediction!</p>
+
+<form action="{{ url_for('index') }}" method="get">
+    <input type="submit" value="Classify new image" />
+</form>
+
+
