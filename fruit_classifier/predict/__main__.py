@@ -29,7 +29,7 @@ def main(image_path='', show_image=False):
     """
 
     if image_path == '':
-        image_path = pick_random_image(from_folder='cleaned_data')
+        image_path = pick_random_image(from_directory='cleaned_data')
 
     # Load the image
     image = open_image(Path(image_path))
@@ -73,4 +73,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.image, show_image=True)
-    # main()
+
