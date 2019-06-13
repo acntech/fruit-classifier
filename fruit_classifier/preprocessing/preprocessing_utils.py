@@ -55,6 +55,44 @@ def truncate_filenames(raw_dir):
               + str(sub_dir_path.name))
 
 
+def onedrive_compatibility_filenames(raw_dir):
+    """
+    Replace % in filenames with other characters
+
+    Assumes raw_dir is a directory that contains ONLY directories,
+    in which all files/directories will be truncated if their total
+    path length is more than 255 characters.
+
+    Parameters
+    ----------
+    raw_dir: Will truncate files in raw_dir's subfolders
+
+    """
+
+    subdirectory_list = [p for p in Path(raw_dir).glob('*')
+                         if p.is_dir()]
+    print("Removing percent signs (%) from filenames ")
+
+    for sub_dir_path in subdirectory_list:
+
+        # Get all files in directory
+        file_list = list(Path(sub_dir_path).glob('*'))
+        num_renamed = 0
+        for filepath in file_list:
+            filename = filepath.name
+            if "%" in filename:
+                new_filename = filename.replace("%20", "_").replace("%", "")
+
+                old_path = sub_dir_path.joinpath(filename)
+                new_path = sub_dir_path.joinpath(new_filename)
+
+                Path.rename(old_path, new_path)
+                num_renamed = num_renamed + 1
+        print('Truncated ' + str(num_renamed)
+              + ' filenames in directory: '
+              + str(sub_dir_path.name))
+
+
 def remove_non_images(raw_dir, clean_dir):
     """
     Removes images which are not readable

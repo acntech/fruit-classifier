@@ -3,6 +3,8 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
     remove_non_images
 from fruit_classifier.preprocessing.preprocessing_utils import \
     truncate_filenames
+from fruit_classifier.preprocessing.preprocessing_utils import \
+    onedrive_compatibility_filenames
 
 
 def main():
@@ -17,6 +19,8 @@ def main():
     raw_dir = generated_data_dir.joinpath('raw_data')
     cleaned_dir = generated_data_dir.joinpath('cleaned_data')
 
+    # Replace %-signs from filenames
+    onedrive_compatibility_filenames(raw_dir)
     # Shorten filenames if they are so long that Windows protests
     truncate_filenames(raw_dir)
 
