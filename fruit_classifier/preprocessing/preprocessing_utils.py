@@ -38,7 +38,7 @@ def truncate_filenames(raw_dir):
         for filepath in file_list:
             filename = filepath.name
             file_path_len = len(filename)
-            if file_path_len <= max_windows_path_length:
+            if file_path_len <= available_max_len:
                 continue
             possible_types = filename.split('.')
             file_type = possible_types[-1]
