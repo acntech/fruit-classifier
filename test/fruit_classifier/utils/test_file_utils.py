@@ -7,8 +7,8 @@ from fruit_classifier.utils.file_utils import copytree
 class TestFileUtils(unittest.TestCase):
 
     def setUp(self):
-        self.root_dir = Path(__file__).absolute().parents[1]
-        self.src_path = self.root_dir.joinpath('test_data')
+        self.root_dir = Path(__file__).absolute().parents[2]
+        self.src_path = self.root_dir.joinpath('data')
         self.dst_path = self.root_dir.joinpath('test_data_copy')
 
     def tearDown(self):

@@ -7,39 +7,37 @@ from fruit_classifier.train.train_utils import train_model
 from fruit_classifier.train.train_utils import plot_training
 from fruit_classifier.preprocessing.preprocessing_utils import \
     get_image_generator
+from fruit_classifier.preprocessing.preprocessing_utils import \
+    resize_images
 from pathlib import Path
 import shutil
 
 
 class TestTrainUtils(unittest.TestCase):
     def setUp(self):
-        test_dir = Path(__file__).absolute().parents[1]
+        test_dir = Path(__file__).absolute().parents[2]
 
         # Select a unique directory name for a new directory
-        directory_name = 'temp_directory'
-        self.directory_name = test_dir.joinpath(directory_name)
-        while self.directory_name.is_dir():
-            directory_name = directory_name + '_'
-            self.directory_name = test_dir.joinpath(directory_name)
+        self.tmp_dir = test_dir.joinpath('data', 'tmp_dir')
 
         # Make directory and two subdirectories
         classes = ('class_a', 'class_b')
         self.n_classes = len(classes)
 
         for c in classes:
-            self.directory_name.joinpath(c).mkdir(parents=True,
-                                                  exist_ok=True)
+            self.tmp_dir.joinpath(c).mkdir(parents=True,
+                                           exist_ok=True)
 
         # Copy an image into each of those subdirectories
-        orig_file_path = test_dir.joinpath("test_data").\
+        orig_file_path = test_dir.joinpath("data").\
             joinpath("original_test_image.jpg")
 
         for c in classes:
             shutil.copy(str(orig_file_path),
-                        str(self.directory_name.joinpath(c)))
+                        str(self.tmp_dir.joinpath(c)))
 
         # Get the image_paths
-        self.image_paths = get_image_paths(self.directory_name)
+        self.image_paths = get_image_paths(self.tmp_dir)
 
         # Set number of epochs globally
         self.num_intended_epochs = 2
@@ -100,8 +98,13 @@ class TestTrainUtils(unittest.TestCase):
         self.assertTrue(model._built)
 
     def test_train_model(self):
+        # Resize the images
+        resize_images(self.tmp_dir)
+        # Re-run image paths after resizing (extension may be altered)
+        image_paths = get_image_paths(self.tmp_dir)
         # Run train_model and verify outputs
-        data, labels = get_data_and_labels(self.image_paths)
+        data, labels = get_data_and_labels(image_paths)
+
         x_train, x_val, y_train, y_val = get_model_input(data, labels)
         image_generator = get_image_generator()
 
@@ -132,7 +135,7 @@ class TestTrainUtils(unittest.TestCase):
 
     def tearDown(self):
         # Delete the temporary directory its contents
-        shutil.rmtree(self.directory_name)
+        shutil.rmtree(self.tmp_dir)
 
 
 if __name__ == "__main__":

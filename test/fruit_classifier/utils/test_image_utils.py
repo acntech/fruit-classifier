@@ -9,13 +9,13 @@ class TestImageUtils(unittest.TestCase):
 
     def setUp(self):
 
-        test_dir = Path(__file__).absolute().parents[1]
+        test_dir = Path(__file__).absolute().parents[2]
 
         self.jpg_image_file_name = \
-            test_dir.joinpath("test_data",
+            test_dir.joinpath("data",
                               "original_test_image.jpg")
         self.png_image_file_name = \
-            test_dir.joinpath("test_data",
+            test_dir.joinpath("data",
                               "original_test_image.png")
 
         self.test_orig_shape = [115, 73, 3]

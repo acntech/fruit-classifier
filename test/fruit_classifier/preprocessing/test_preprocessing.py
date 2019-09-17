@@ -13,9 +13,9 @@ class TestPreprocessingUtils(unittest.TestCase):
 
     def setUp(self):
 
-        self.test_dir = Path(__file__).absolute().parents[1]
+        self.test_dir = Path(__file__).absolute().parents[2]
         self.jpg_image_file_name = self.test_dir.joinpath(
-            "test_data", "original_test_image.jpg")
+            "data", "original_test_image.jpg")
         self.tmp_dir_path = self.test_dir.joinpath('tmp_dir')
 
         # Correct dimensions

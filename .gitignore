@@ -124,4 +124,5 @@ dmypy.json
 backup/
 data/
 model_files/
+reports/
 chromedriver
