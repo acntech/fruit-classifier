@@ -1,12 +1,15 @@
 from pathlib import Path
 from fruit_classifier.preprocessing.preprocessing_utils import \
-    remove_non_images
+    copy_valid_images
+from fruit_classifier.preprocessing.preprocessing_utils import \
+    resize_images
 from fruit_classifier.preprocessing.preprocessing_utils import \
     truncate_filenames
 
 
 def main():
     """"
+    # FIXME: raw_data, cleaned_data etc.
     Pre-processes the images in raw_data
 
     The resulting images are stored in cleaned_data
@@ -23,7 +26,8 @@ def main():
     if not interim_dir.is_dir():
         interim_dir.mkdir(parents=True, exist_ok=True)
 
-    remove_non_images(raw_dir, interim_dir)
+    copy_valid_images(raw_dir, interim_dir)
+    resize_images(interim_dir)
 
 
 if __name__ == '__main__':

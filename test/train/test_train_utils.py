@@ -1,5 +1,5 @@
 import unittest
-from fruit_classifier.train.train_utils import get_image_paths
+from fruit_classifier.utils.image_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
 from fruit_classifier.train.train_utils import get_model_input
 from fruit_classifier.train.train_utils import get_model
@@ -33,7 +33,7 @@ class TestTrainUtils(unittest.TestCase):
         # Copy an image into each of those subdirectories
         orig_file_path = test_dir.joinpath("test_data").\
             joinpath("original_test_image.jpg")
-        
+
         for c in classes:
             shutil.copy(str(orig_file_path),
                         str(self.directory_name.joinpath(c)))

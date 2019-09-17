@@ -2,8 +2,11 @@ import cv2
 from keras.preprocessing.image import ImageDataGenerator
 from tqdm import tqdm
 from skimage.transform import resize
+from skimage.io import imsave
 from pathlib import Path
 from fruit_classifier.utils.file_utils import copytree
+from fruit_classifier.utils.image_utils import get_image_paths, \
+    open_image
 
 
 def truncate_filenames(raw_dir):
@@ -55,7 +58,7 @@ def truncate_filenames(raw_dir):
               + str(sub_dir_path.name))
 
 
-def remove_non_images(raw_dir, clean_dir):
+def copy_valid_images(raw_dir, clean_dir):
     """
     Removes images which are not readable
 
@@ -94,8 +97,9 @@ def remove_non_images(raw_dir, clean_dir):
         print('    {}/{} remaining in {}'.format(n_clean, n_raw, c))
 
 
-def preprocess_image(image):
+def resize_image(image):
     """
+    #FIXME
     Pre-processes a single image
 
     Parameters
@@ -113,9 +117,25 @@ def preprocess_image(image):
                                 output_shape=(28, 28),
                                 mode='reflect',
                                 anti_aliasing=True)
-    preprocessed_image = preprocessed_image / 255.0
 
     return preprocessed_image
+
+
+def resize_images(path):
+    """
+    Overwrites the images in `path` with the resized version
+
+    Parameters
+    ----------
+    path : Path
+        The path to the image files
+    """
+    image_paths = get_image_paths(path)
+
+    for image_path in tqdm(image_paths, desc='Resizing images'):
+        image_array = open_image(image_path)
+        resized_array = resize_image(image_array)
+        imsave(image_path, resized_array)
 
 
 def get_image_generator(rotation_range=30,

@@ -1,6 +1,6 @@
 import pickle
 from pathlib import Path
-from fruit_classifier.train.train_utils import get_image_paths
+from fruit_classifier.utils.image_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
 from fruit_classifier.train.train_utils import get_model_input
 from fruit_classifier.train.train_utils import get_model

@@ -7,7 +7,7 @@ from fruit_classifier.predict.predict_utils import classify
 from fruit_classifier.predict.predict_utils import load_classifier
 from fruit_classifier.utils.image_utils import open_image
 from fruit_classifier.preprocessing.preprocessing_utils import \
-    preprocess_image
+    resize_image
 
 
 def main(image_path, show_image=False):
@@ -32,7 +32,7 @@ def main(image_path, show_image=False):
     orig = image.copy()
 
     # Pre-process the image for classification
-    image = preprocess_image(image)
+    image = resize_image(image)
     # Expand the dimension (i.e. make the batch size = 1)
     image = np.expand_dims(image, axis=0)
 

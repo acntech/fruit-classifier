@@ -1,4 +1,3 @@
-import random
 import pickle
 import numpy as np
 from pathlib import Path
@@ -10,35 +9,7 @@ from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from fruit_classifier.models.models import get_lenet
-from fruit_classifier.preprocessing.preprocessing_utils import \
-    preprocess_image
-
 from fruit_classifier.utils.image_utils import open_image
-
-
-def get_image_paths(path):
-    """
-    Returns a list of random shuffled image paths
-
-    Parameters
-    ----------
-    path : Path
-        Path to the training images
-
-    Returns
-    -------
-    image_paths : list
-        Random shuffled image paths
-    """
-
-    print('[INFO] Loading images...')
-
-    image_paths = sorted(path.glob('**/*'))
-    image_paths = [p for p in image_paths if p.is_file()]
-    random.seed(42)
-    random.shuffle(image_paths)
-
-    return image_paths
 
 
 def get_data_and_labels(image_paths):
@@ -61,20 +32,18 @@ def get_data_and_labels(image_paths):
     data = list()
     labels = list()
     # Loop over the input images
-    for image_path in tqdm(image_paths,
-                           desc='Loading and pre-processing images'):
+    for image_path in tqdm(image_paths, desc='Loading the images'):
         tqdm.write(str(image_path))
         # Load the image, pre-process it, and store it in the data list
         image_array = open_image(image_path)
-        processed_image = preprocess_image(image_array)
-        data.append(processed_image)
+        data.append(image_array)
 
         # Extract the class label from the image path and update the
         # labels list
         label = image_path.parts[-2]
         labels.append(label)
     # Scale the raw pixel intensities to the range [0, 1]
-    data = np.array(data, dtype='float')
+    data = np.array(data, dtype='float')/255
     labels = np.array(labels)
 
     # Pickle the data and labels

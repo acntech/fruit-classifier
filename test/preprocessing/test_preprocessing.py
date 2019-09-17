@@ -6,7 +6,7 @@ import shutil
 from fruit_classifier.preprocessing.preprocessing_utils \
     import truncate_filenames
 from fruit_classifier.preprocessing.preprocessing_utils \
-    import preprocess_image
+    import resize_image
 
 
 class TestPreprocessingUtils(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestPreprocessingUtils(unittest.TestCase):
         self.raw = cv2.imread(str(self.jpg_image_file_name))
 
         # Create a compressed version
-        self.comp = preprocess_image(self.raw)
+        self.comp = resize_image(self.raw)
 
     def tearDown(self):
         # Tear down the tmp_dir if it has been created
