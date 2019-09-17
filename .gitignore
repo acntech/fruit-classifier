@@ -121,5 +121,7 @@ dmypy.json
 *.swo
 .idea/
 .DS_Store
-generated_data/
+backup/
+data/
+model_files/
 chromedriver

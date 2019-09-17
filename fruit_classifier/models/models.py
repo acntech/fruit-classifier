@@ -53,4 +53,3 @@ def get_lenet(height, width, channels, classes):
     model.add(Dense(classes, activation='softmax'))
 
     return model
-

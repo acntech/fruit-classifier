@@ -17,7 +17,7 @@ def main(categories=('bananas', 'apples', 'oranges'),
     """
 
     root_dir = Path(__file__).absolute().parents[2]
-    destination_dir = root_dir.joinpath('generated_data', 'raw_data')
+    destination_dir = root_dir.joinpath('data', 'raw')
 
     if not destination_dir.is_dir():
         destination_dir.mkdir(parents=True, exist_ok=True)

@@ -80,7 +80,7 @@ def get_data_and_labels(image_paths):
     # Pickle the data and labels
     processed_dir =  \
         Path(__file__).absolute().parents[2].\
-        joinpath('generated_data', 'preprocessed_data')
+        joinpath('data', 'processed')
 
     if not processed_dir.is_dir():
         processed_dir.mkdir(parents=True, exist_ok=True)
@@ -128,7 +128,7 @@ def get_model_input(data, labels):
     encoded_labels = label_encoder.transform(labels)
 
     encoder_dir =  \
-        Path(__file__).absolute().parents[2].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('model_files',
                                                       'encoders')
     if not encoder_dir.is_dir():
         encoder_dir.mkdir(parents=True, exist_ok=True)
@@ -260,7 +260,7 @@ def train_model(model,
     print('[INFO] Serializing network...')
 
     model_dir = \
-        Path(__file__).absolute().parents[2].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('model_files',
                                                       'models')
     model_path = model_dir.joinpath('model.h5')
 
@@ -306,8 +306,8 @@ def plot_training(history):
     plt.legend(loc='lower left')
 
     plot_dir = \
-        Path(__file__).absolute().parents[2].joinpath('generated_data',
-                                                      'plots')
+        Path(__file__).absolute().parents[2].joinpath('reports',
+                                                      'figures')
 
     if not plot_dir.is_dir():
         plot_dir.mkdir(parents=True, exist_ok=True)

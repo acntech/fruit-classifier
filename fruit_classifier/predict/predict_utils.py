@@ -66,7 +66,7 @@ def classify(model, images):
 
     # Load the label encoder
     encoder_dir = \
-        Path(__file__).absolute().parents[2].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('model_files',
                                                       'encoders')
     encoder_path = encoder_dir.joinpath('encoder.pkl')
 
@@ -90,7 +90,7 @@ def load_classifier():
 
     print('[INFO] loading network...')
     model_dir = \
-        Path(__file__).absolute().parents[2].joinpath('generated_data',
+        Path(__file__).absolute().parents[2].joinpath('model_files',
                                                       'models')
     model_path = model_dir.joinpath('model.h5')
     model = load_model(str(model_path))

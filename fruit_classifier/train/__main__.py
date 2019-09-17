@@ -24,17 +24,17 @@ def main():
     5. Plot the training
     """
 
-    generated_data_dir = \
-        Path(__file__).absolute().parents[2].joinpath('generated_data')
-    cleaned_dir = generated_data_dir.joinpath('cleaned_data')
-    preprocessed_dir = generated_data_dir.joinpath('preprocessed_data')
+    data_dir = \
+        Path(__file__).absolute().parents[2].joinpath('data')
+    interim_dir = data_dir.joinpath('interim')
+    processed_dir = data_dir.joinpath('processed')
 
     # Grab the image paths and randomly shuffle them
-    image_paths = get_image_paths(cleaned_dir)
+    image_paths = get_image_paths(interim_dir)
 
     # Load the data and and label and split to train and validation
-    data_path = preprocessed_dir.joinpath('data.pkl')
-    labels_path = preprocessed_dir.joinpath('labels.pkl')
+    data_path = processed_dir.joinpath('data.pkl')
+    labels_path = processed_dir.joinpath('labels.pkl')
     if data_path.is_file() and labels_path.is_file():
         with data_path.open('rb') as f:
             data = pickle.load(f)
