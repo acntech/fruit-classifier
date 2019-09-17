@@ -1,4 +1,5 @@
 import cv2
+import imghdr
 from keras.preprocessing.image import ImageDataGenerator
 from tqdm import tqdm
 from skimage.transform import resize
@@ -118,7 +119,7 @@ def resize_image(image):
                                 mode='reflect',
                                 anti_aliasing=True)
 
-    return preprocessed_image
+    return preprocessed_image.astype('uint8')
 
 
 def resize_images(path):
@@ -135,7 +136,18 @@ def resize_images(path):
     for image_path in tqdm(image_paths, desc='Resizing images'):
         image_array = open_image(image_path)
         resized_array = resize_image(image_array)
-        imsave(image_path, resized_array)
+        # Determine image type as imsave is sensitive to the file
+        # extension
+        extension = imghdr.what(image_path)
+        extension = f'.{extension}' if extension is not None else '.png'
+        if extension == image_path.suffix:
+            save_path = image_path
+        else:
+            save_path = \
+                image_path.parent.joinpath(image_path.stem + extension)
+            image_path.unlink()
+
+        imsave(save_path, resized_array)
 
 
 def get_image_generator(rotation_range=30,
