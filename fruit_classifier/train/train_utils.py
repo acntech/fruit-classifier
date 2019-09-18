@@ -171,6 +171,7 @@ def get_model(n_classes,
 
 def train_model(model,
                 image_generator,
+                model_dir,
                 x_train,
                 y_train,
                 x_val,
@@ -186,6 +187,8 @@ def train_model(model,
         The model to train
     image_generator : ImageDataGenerator
         The image data generator to use
+    model_dir : Path
+        Directory to store the model
     x_train : np.array, shape (n_train, height, width, channels)
         The training data
     x_val : np.array, shape (n_val, height, width, channels)
@@ -226,9 +229,6 @@ def train_model(model,
     # Save the model to disk
     print('[INFO] Serializing network...')
 
-    model_dir = \
-        Path(__file__).absolute().parents[2].joinpath('model_files',
-                                                      'models')
     model_path = model_dir.joinpath('model.h5')
 
     if not model_dir.is_dir():
@@ -240,7 +240,7 @@ def train_model(model,
     return history
 
 
-def plot_training(history):
+def plot_training(history, plot_dir):
     """
     Plots the training loss and accuracy
 
@@ -254,6 +254,8 @@ def plot_training(history):
         - val_loss
         - acc
         - val_acc
+    plot_dir : Path
+        Directory where to store the plot
     """
 
     plt.style.use('ggplot')
@@ -271,10 +273,6 @@ def plot_training(history):
     plt.xlabel('Epoch #')
     plt.ylabel('Loss/Accuracy')
     plt.legend(loc='lower left')
-
-    plot_dir = \
-        Path(__file__).absolute().parents[2].joinpath('reports',
-                                                      'figures')
 
     if not plot_dir.is_dir():
         plot_dir.mkdir(parents=True, exist_ok=True)

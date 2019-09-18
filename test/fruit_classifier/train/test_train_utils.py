@@ -18,8 +18,10 @@ class TestTrainUtils(unittest.TestCase):
         test_dir = Path(__file__).absolute().parents[2]
 
         # Select a unique directory name for a new directory
-        self.tmp_dir = test_dir.joinpath('data', 'tmp_dir')
+        self.tmp_dir = test_dir.joinpath('tmp_dir')
         self.processed_dir = self.tmp_dir.joinpath('processed')
+        self.model_dir = self.tmp_dir.joinpath('models')
+        self.plot_dir = self.tmp_dir.joinpath('figures')
 
         # Make directory and two subdirectories
         classes = ('class_a', 'class_b')
@@ -117,6 +119,7 @@ class TestTrainUtils(unittest.TestCase):
 
         history = train_model(model,
                               image_generator,
+                              self.model_dir,
                               x_train,
                               y_train,
                               x_val,
@@ -135,7 +138,7 @@ class TestTrainUtils(unittest.TestCase):
                                val_loss=(1, 2),
                                acc=(1, 2),
                                val_acc=(1, 2),)
-        plot_training(history)
+        plot_training(history, self.plot_dir)
 
     def tearDown(self):
         # Delete the temporary directory its contents

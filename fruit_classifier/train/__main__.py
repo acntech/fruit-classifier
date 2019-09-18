@@ -25,10 +25,12 @@ def main():
     5. Plot the training
     """
 
-    data_dir = \
-        Path(__file__).absolute().parents[2].joinpath('data')
+    root_dir = Path(__file__).absolute().parents[2]
+    data_dir = root_dir.joinpath('data')
     interim_dir = data_dir.joinpath('interim')
     processed_dir = data_dir.joinpath('processed')
+    model_dir = root_dir.joinpath('model_files', 'models')
+    plot_dir = root_dir.joinpath('reports', 'figures')
 
     # Grab the image paths and randomly shuffle them
     image_paths = get_image_paths(interim_dir)
@@ -58,13 +60,14 @@ def main():
     # Train the network
     history = train_model(model,
                           image_generator,
+                          model_dir,
                           x_train,
                           y_train,
                           x_val,
                           y_val)
 
     # Plot the training loss and accuracy
-    plot_training(history)
+    plot_training(history, plot_dir)
 
 
 if __name__ == '__main__':

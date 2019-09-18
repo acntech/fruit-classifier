@@ -3,8 +3,11 @@
 .DS_Store
 chromedriver*
 docker/
-generated_data/
+data/
+backup/
+reports/
+model_files/
+upload_dir/
 
-# Unignore the encoders and models
-!generated_data/encoders
-!generated_data/models
+# Unignore test/data
+!test/data

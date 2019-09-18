@@ -126,3 +126,4 @@ data/
 model_files/
 reports/
 chromedriver
+upload_dir/

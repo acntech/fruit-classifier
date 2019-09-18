@@ -15,7 +15,9 @@ from fruit_classifier.predict.__main__ import main
 app = Flask(__name__)
 
 # Make upload directory and allowed extensions visible in file scope
-UPLOAD_DIR = Path(__file__).absolute().parents[2].joinpath('upload_dir')
+ROOT_DIR = Path(__file__).absolute().parents[1]
+UPLOAD_DIR = ROOT_DIR.joinpath('upload_dir')
+MODEL_FILES_DIR = ROOT_DIR.joinpath('model_files')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 if not UPLOAD_DIR.is_dir():
@@ -155,10 +157,10 @@ def classify_file(filename):
 
     # Clear any existing keras sessions and predict
     keras.backend.clear_session()
-    output = main(path)
+    output = main(path, MODEL_FILES_DIR)
 
-    # Store the output image
-    cv2.imwrite(str(path), output)
+    # Store the output image after converting to GBR
+    cv2.imwrite(str(path), output[..., ::-1])
 
     # The image is encoded to base64 in order to display it
     result_b64 = base64.b64encode(path.read_bytes()).decode('utf-8')

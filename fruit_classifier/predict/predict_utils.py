@@ -42,7 +42,7 @@ def draw_class_on_image(image, probability_text):
     return output_image
 
 
-def classify(model, images):
+def classify(model, images, model_file_dir):
     """
     Classifies a single image and returns the label and probability
 
@@ -52,6 +52,8 @@ def classify(model, images):
         The model to predict from
     images : np.array (examples,  height, width, channels)
         The images to predict
+    model_file_dir : Path
+        Directory to the model files
 
     Returns
     -------
@@ -65,10 +67,7 @@ def classify(model, images):
     labels = np.argmax(probabilities, axis=1)
 
     # Load the label encoder
-    encoder_dir = \
-        Path(__file__).absolute().parents[2].joinpath('model_files',
-                                                      'encoders')
-    encoder_path = encoder_dir.joinpath('encoder.pkl')
+    encoder_path = model_file_dir.joinpath('encoders', 'encoder.pkl')
 
     with encoder_path.open('rb') as f:
         label_encoder = pickle.load(f)
@@ -78,9 +77,14 @@ def classify(model, images):
     return labels, probabilities
 
 
-def load_classifier():
+def load_classifier(model_file_dir):
     """
     Loads the classifier
+
+    Parameters
+    ----------
+    model_file_dir : Path
+        Path to the model files directory
 
     Returns
     -------
@@ -89,10 +93,8 @@ def load_classifier():
     """
 
     print('[INFO] loading network...')
-    model_dir = \
-        Path(__file__).absolute().parents[2].joinpath('model_files',
-                                                      'models')
-    model_path = model_dir.joinpath('model.h5')
+
+    model_path = model_file_dir.joinpath('models', 'model.h5')
     model = load_model(str(model_path))
 
     return model
