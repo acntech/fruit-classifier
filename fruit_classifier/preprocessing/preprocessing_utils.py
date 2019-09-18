@@ -59,7 +59,7 @@ def truncate_filenames(raw_dir):
               + str(sub_dir_path.name))
 
 
-def copy_valid_images(raw_dir, clean_dir):
+def copy_valid_images(raw_dir, interim_dir):
     """
     Removes images which are not readable
 
@@ -67,14 +67,14 @@ def copy_valid_images(raw_dir, clean_dir):
     ----------
     raw_dir : Path
         Path to the raw dataset
-    clean_dir : Path
+    interim_dir : Path
         Path for the cleaned dataset
     """
 
-    copytree(raw_dir, clean_dir)
+    copytree(raw_dir, interim_dir)
 
     # Find all image_paths
-    image_paths = sorted(clean_dir.glob('**/*'))
+    image_paths = sorted(interim_dir.glob('**/*'))
     image_paths = [image_path for image_path in image_paths if
                    image_path.is_file()]
 
@@ -88,11 +88,11 @@ def copy_valid_images(raw_dir, clean_dir):
     raw_dirs = sorted(raw_dir.glob('*'))
     raw_dirs = [d for d in raw_dirs if d.is_dir()]
 
-    clean_dirs = sorted(clean_dir.glob('*'))
-    clean_dirs = [d for d in clean_dirs if d.is_dir()]
+    interim_dirs = sorted(interim_dir.glob('*'))
+    interim_dirs = [d for d in interim_dirs if d.is_dir()]
 
     print('\nResult of cleaning:')
-    for r, c in zip(raw_dirs, clean_dirs):
+    for r, c in zip(raw_dirs, interim_dirs):
         n_raw = len(list(r.glob('*')))
         n_clean = len(list(c.glob('*')))
         print('    {}/{} remaining in {}'.format(n_clean, n_raw, c))
@@ -100,8 +100,7 @@ def copy_valid_images(raw_dir, clean_dir):
 
 def resize_image(image):
     """
-    #FIXME
-    Pre-processes a single image
+    Resize a single image
 
     Parameters
     ----------
@@ -110,16 +109,16 @@ def resize_image(image):
 
     Returns
     -------
-    preprocessed_image : np.array, shape (new_h, new_w, new_c)
-        The preprocessed image
+    resized_image : np.array, shape (new_h, new_w, new_c)
+        The resized image
     """
 
-    preprocessed_image = resize(image,
-                                output_shape=(28, 28),
-                                mode='reflect',
-                                anti_aliasing=True)
+    resized_image = resize(image,
+                           output_shape=(28, 28),
+                           mode='reflect',
+                           anti_aliasing=True)
 
-    return preprocessed_image.astype('uint8')
+    return resized_image.astype('uint8')
 
 
 def resize_images(path):
@@ -134,6 +133,7 @@ def resize_images(path):
     image_paths = get_image_paths(path)
 
     for image_path in tqdm(image_paths, desc='Resizing images'):
+        tqdm.write(str(image_path))
         image_array = open_image(image_path)
         resized_array = resize_image(image_array)
         # Determine image type as imsave is sensitive to the file

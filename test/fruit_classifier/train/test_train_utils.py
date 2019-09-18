@@ -19,6 +19,7 @@ class TestTrainUtils(unittest.TestCase):
 
         # Select a unique directory name for a new directory
         self.tmp_dir = test_dir.joinpath('data', 'tmp_dir')
+        self.processed_dir = self.tmp_dir.joinpath('processed')
 
         # Make directory and two subdirectories
         classes = ('class_a', 'class_b')
@@ -49,13 +50,15 @@ class TestTrainUtils(unittest.TestCase):
 
     def test_get_data_and_labels(self):
         # Run get_data_and_labels and verify outputs
-        data, labels = get_data_and_labels(self.image_paths)
+        data, labels = \
+            get_data_and_labels(self.image_paths, self.processed_dir)
         self.assertGreater(len(data), 0)
         self.assertGreater(len(labels), 0)
 
     def test_get_model_input(self):
         # Run get_model_input and verify outputs
-        data, labels = get_data_and_labels(self.image_paths)
+        data, labels = \
+            get_data_and_labels(self.image_paths, self.processed_dir)
         x_train, x_val, y_train, y_val = get_model_input(data, labels)
         self.assertEqual(1, len(x_train))
         self.assertEqual(1, len(x_val))
@@ -103,7 +106,8 @@ class TestTrainUtils(unittest.TestCase):
         # Re-run image paths after resizing (extension may be altered)
         image_paths = get_image_paths(self.tmp_dir)
         # Run train_model and verify outputs
-        data, labels = get_data_and_labels(image_paths)
+        data, labels = \
+            get_data_and_labels(image_paths, self.processed_dir)
 
         x_train, x_val, y_train, y_val = get_model_input(data, labels)
         image_generator = get_image_generator()

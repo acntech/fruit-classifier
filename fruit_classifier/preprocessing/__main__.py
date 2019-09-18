@@ -9,10 +9,9 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
 
 def main():
     """"
-    # FIXME: raw_data, cleaned_data etc.
-    Pre-processes the images in raw_data
+    Pre-processes the images in data/raw
 
-    The resulting images are stored in cleaned_data
+    The resulting images are stored in data/interim
     """
 
     data_dir = \

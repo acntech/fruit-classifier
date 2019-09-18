@@ -43,7 +43,7 @@ the code in `fruit_classifier/preprocessing.`
 6. Predict with `python -m fruit_classifier.predict -i <path_to_image>`
  
    Example: 
-   `python -m fruit_classifier.predict -i "test\test_data\raw_data\bananas\1. banana-1.png"`
+   `python -m fruit_classifier.predict -i "test\data\raw\bananas\1. banana-1.png"`
 
 ## Troubleshooting
 **Question**: I've done all the assignments and have literally

@@ -12,7 +12,7 @@ from fruit_classifier.models.models import get_lenet
 from fruit_classifier.utils.image_utils import open_image
 
 
-def get_data_and_labels(image_paths):
+def get_data_and_labels(image_paths, processed_dir):
     """
     Returns the data and the labels from the input paths
 
@@ -20,6 +20,8 @@ def get_data_and_labels(image_paths):
     ----------
     image_paths : list
         List of Paths of the image paths
+    processed_dir : Path
+        Path to the directory where the final datasets are stored
 
     Returns
     -------
@@ -47,10 +49,6 @@ def get_data_and_labels(image_paths):
     labels = np.array(labels)
 
     # Pickle the data and labels
-    processed_dir =  \
-        Path(__file__).absolute().parents[2].\
-        joinpath('data', 'processed')
-
     if not processed_dir.is_dir():
         processed_dir.mkdir(parents=True, exist_ok=True)
 

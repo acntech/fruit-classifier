@@ -1,4 +1,5 @@
 import pickle
+import random
 from pathlib import Path
 from fruit_classifier.utils.image_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
@@ -31,6 +32,8 @@ def main():
 
     # Grab the image paths and randomly shuffle them
     image_paths = get_image_paths(interim_dir)
+    random.seed(42)
+    random.shuffle(image_paths)
 
     # Load the data and and label and split to train and validation
     data_path = processed_dir.joinpath('data.pkl')
@@ -41,7 +44,7 @@ def main():
         with labels_path.open('rb') as f:
             labels = pickle.load(f)
     else:
-        data, labels = get_data_and_labels(image_paths)
+        data, labels = get_data_and_labels(image_paths, processed_dir)
 
     x_train, x_val, y_train, y_val = \
         get_model_input(data, labels)
