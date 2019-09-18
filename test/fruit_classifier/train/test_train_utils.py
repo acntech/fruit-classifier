@@ -20,7 +20,7 @@ class TestTrainUtils(unittest.TestCase):
         # Select a unique directory name for a new directory
         self.tmp_dir = test_dir.joinpath('tmp_dir')
         self.processed_dir = self.tmp_dir.joinpath('processed')
-        self.model_dir = self.tmp_dir.joinpath('models')
+        self.model_files_dir = self.tmp_dir.joinpath('model_files')
         self.plot_dir = self.tmp_dir.joinpath('figures')
 
         # Make directory and two subdirectories
@@ -61,7 +61,8 @@ class TestTrainUtils(unittest.TestCase):
         # Run get_model_input and verify outputs
         data, labels = \
             get_data_and_labels(self.image_paths, self.processed_dir)
-        x_train, x_val, y_train, y_val = get_model_input(data, labels)
+        x_train, x_val, y_train, y_val = \
+            get_model_input(data, labels, self.model_files_dir)
         self.assertEqual(1, len(x_train))
         self.assertEqual(1, len(x_val))
         self.assertEqual(1, len(y_train))
@@ -111,7 +112,8 @@ class TestTrainUtils(unittest.TestCase):
         data, labels = \
             get_data_and_labels(image_paths, self.processed_dir)
 
-        x_train, x_val, y_train, y_val = get_model_input(data, labels)
+        x_train, x_val, y_train, y_val = \
+            get_model_input(data, labels, self.model_files_dir)
         image_generator = get_image_generator()
 
         model = get_model(self.n_classes,
@@ -119,7 +121,7 @@ class TestTrainUtils(unittest.TestCase):
 
         history = train_model(model,
                               image_generator,
-                              self.model_dir,
+                              self.model_files_dir,
                               x_train,
                               y_train,
                               x_val,

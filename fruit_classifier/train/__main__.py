@@ -29,7 +29,7 @@ def main():
     data_dir = root_dir.joinpath('data')
     interim_dir = data_dir.joinpath('interim')
     processed_dir = data_dir.joinpath('processed')
-    model_dir = root_dir.joinpath('model_files', 'models')
+    model_files_dir = root_dir.joinpath('model_files')
     plot_dir = root_dir.joinpath('reports', 'figures')
 
     # Grab the image paths and randomly shuffle them
@@ -49,7 +49,7 @@ def main():
         data, labels = get_data_and_labels(image_paths, processed_dir)
 
     x_train, x_val, y_train, y_val = \
-        get_model_input(data, labels)
+        get_model_input(data, labels, model_files_dir)
 
     # Construct the image generator for data augmentation
     image_generator = get_image_generator()
@@ -60,7 +60,7 @@ def main():
     # Train the network
     history = train_model(model,
                           image_generator,
-                          model_dir,
+                          model_files_dir,
                           x_train,
                           y_train,
                           x_val,

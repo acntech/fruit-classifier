@@ -67,7 +67,7 @@ def get_data_and_labels(image_paths, processed_dir):
     return data, labels
 
 
-def get_model_input(data, labels):
+def get_model_input(data, labels, model_files_dir):
     """
     Returns the input to the model
 
@@ -77,6 +77,8 @@ def get_model_input(data, labels):
         The images as numpy array
     labels : np.array, shape (n_images,)
         The corresponding labels
+    model_files_dir : Path
+        Path to the model files
 
     Returns
     -------
@@ -94,9 +96,7 @@ def get_model_input(data, labels):
     label_encoder.fit(labels)
     encoded_labels = label_encoder.transform(labels)
 
-    encoder_dir =  \
-        Path(__file__).absolute().parents[2].joinpath('model_files',
-                                                      'encoders')
+    encoder_dir = model_files_dir.joinpath('encoders')
     if not encoder_dir.is_dir():
         encoder_dir.mkdir(parents=True, exist_ok=True)
 
@@ -171,7 +171,7 @@ def get_model(n_classes,
 
 def train_model(model,
                 image_generator,
-                model_dir,
+                model_files_dir,
                 x_train,
                 y_train,
                 x_val,
@@ -187,7 +187,7 @@ def train_model(model,
         The model to train
     image_generator : ImageDataGenerator
         The image data generator to use
-    model_dir : Path
+    model_files_dir : Path
         Directory to store the model
     x_train : np.array, shape (n_train, height, width, channels)
         The training data
@@ -229,6 +229,7 @@ def train_model(model,
     # Save the model to disk
     print('[INFO] Serializing network...')
 
+    model_dir = model_files_dir.joinpath('models')
     model_path = model_dir.joinpath('model.h5')
 
     if not model_dir.is_dir():
