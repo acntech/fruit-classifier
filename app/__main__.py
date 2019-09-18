@@ -168,4 +168,9 @@ def classify_file(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port='5000')
+    # NOTE: Threaded is set to False to have the loaded model on the
+    #       same thread
+    #       See
+    #       https://stackoverflow.com/questions/49400440/using-keras-model-in-flask-app-with-threading
+    #       for details
+    app.run(debug=False, host='0.0.0.0', port='5000', threaded=False)

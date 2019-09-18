@@ -1,12 +1,12 @@
 .git
 .pytest_cache
 .DS_Store
+.idea
 chromedriver*
 docker/
 data/
 backup/
 reports/
-model_files/
 upload_dir/
 
 # Unignore test/data
