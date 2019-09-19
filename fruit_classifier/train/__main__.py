@@ -16,9 +16,7 @@ def main():
     This is the main module for training the fruit-classifier
 
     This method will
-    1. Load all the images from the 'raw_dir' directory
-        - NOTE: The images must be sorted in directories according to
-          class in 'raw_dir'
+    1. Load all the images from the 'interim' directory
     2. Split the data in train and validate
     3. Initialize a model
     4. Train the model

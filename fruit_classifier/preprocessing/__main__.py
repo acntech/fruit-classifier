@@ -3,15 +3,14 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
     copy_valid_images
 from fruit_classifier.preprocessing.preprocessing_utils import \
     resize_images
-from fruit_classifier.preprocessing.preprocessing_utils import \
-    truncate_filenames
+from fruit_classifier.utils.file_utils import truncate_filenames
 
 
 def main():
     """"
-    Pre-processes the images in data/raw
+    Pre-processes the images in `data/raw`
 
-    The resulting images are stored in data/interim
+    The resulting images are stored in `data/interim`
     """
 
     data_dir = \

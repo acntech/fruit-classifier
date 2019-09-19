@@ -3,8 +3,7 @@ import cv2
 from pathlib import Path
 import numpy as np
 import shutil
-from fruit_classifier.preprocessing.preprocessing_utils \
-    import truncate_filenames
+from fruit_classifier.utils.file_utils import truncate_filenames
 from fruit_classifier.preprocessing.preprocessing_utils \
     import resize_image
 

@@ -6,7 +6,7 @@ from google_images_download import google_images_download
 def main(categories=('bananas', 'apples', 'oranges'),
          limit=700):
     """
-    Scrapes google for the images given in keywords
+    Scrapes google for the images given as categories
 
     Parameters
     ----------

@@ -74,7 +74,7 @@ def get_model_input(data, labels, model_files_dir):
     Parameters
     ----------
     data : np.array, shape (n_images, height, width, channels)
-        The images as numpy array
+        The images as a numpy array
     labels : np.array, shape (n_images,)
         The corresponding labels
     model_files_dir : Path
@@ -245,7 +245,7 @@ def plot_training(history, plot_dir):
     """
     Plots the training loss and accuracy
 
-    The plot is saved in the 'generated_data/plots' directory
+    The plot is saved in the 'reports/figures' directory
 
     Parameters
     ----------

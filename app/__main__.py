@@ -151,7 +151,7 @@ def classify_file(filename):
     -------
     Response
         Displays the predicted image in prediction.html
-        This webpage also contains a button to start over
+        This web page also contains a button to start over
     """
     path = Path(app.config['UPLOAD_DIR']).joinpath(filename)
 

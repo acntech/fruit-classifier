@@ -44,7 +44,7 @@ def draw_class_on_image(image, probability_text):
 
 def classify(model, images, model_file_dir):
     """
-    Classifies a single image and returns the label and probability
+    Classifies a images and returns the labels and probabilities
 
     Parameters
     ----------
@@ -58,7 +58,7 @@ def classify(model, images, model_file_dir):
     Returns
     -------
     labels : np.array, shape (examples, )
-        The label with the highest probability
+        The labels with the highest probability
     probabilities : np.array, shape (examples, n_classes)
         The probabilities of all the classes according to the label
         encoder
