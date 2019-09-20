@@ -5,7 +5,7 @@ from keras.layers import Flatten
 from keras.layers import Dense
 
 
-def get_lenet(height, width, channels, classes):
+def lenet(height=28, width=28, channels=3, classes=3):
     """
     Implementation of a LeNet like architecture with input (h, w, c)
 

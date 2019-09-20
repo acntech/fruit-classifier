@@ -8,7 +8,7 @@ from keras.utils import to_categorical
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from fruit_classifier.models.models import get_lenet
+from fruit_classifier.models.factory import ModelFactory
 from fruit_classifier.utils.image_utils import open_image
 
 
@@ -154,10 +154,12 @@ def get_model(n_classes,
 
     print('[INFO] compiling model...')
 
-    model = get_lenet(height=height,
-                      width=width,
-                      channels=channels,
-                      classes=n_classes)
+    # FIXME: get parameters elsewhere
+    setup = dict(height=height,
+                 width=width,
+                 channels=channels,
+                 classes=n_classes)
+    model = ModelFactory.create_model('leNet', setup)
 
     opt = Adam(lr=initial_learning_rate,
                decay=initial_learning_rate / epochs)
