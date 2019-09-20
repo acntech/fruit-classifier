@@ -49,7 +49,7 @@ def copy_valid_images(raw_dir, interim_dir):
         print('    {}/{} remaining in {}'.format(n_clean, n_raw, c))
 
 
-def resize_image(image):
+def resize_image(image, height=28, width=28):
     """
     Resize a single image
 
@@ -57,6 +57,10 @@ def resize_image(image):
     ----------
     image : np.array, shape (height, width, channels)
         The image to resize
+    height : int
+        Height of the resized image
+    width : int
+        Width of the resized image
 
     Returns
     -------
@@ -65,14 +69,14 @@ def resize_image(image):
     """
 
     resized_image = resize(image,
-                           output_shape=(28, 28),
+                           output_shape=(height, width),
                            mode='reflect',
                            anti_aliasing=True)
 
     return resized_image.astype('uint8')
 
 
-def resize_images(path):
+def resize_images(path, height=28, width=28):
     """
     Overwrites the images in `path` with the resized version
 
@@ -80,13 +84,17 @@ def resize_images(path):
     ----------
     path : Path
         The path to the image files
+    height : int
+        Height of the resized images
+    width : int
+        Width of the resized images
     """
     image_paths = get_image_paths(path)
 
     for image_path in tqdm(image_paths, desc='Resizing images'):
         tqdm.write(str(image_path))
         image_array = open_image(image_path)
-        resized_array = resize_image(image_array)
+        resized_array = resize_image(image_array, height, width)
         # Determine image type as imsave is sensitive to the file
         # extension
         extension = imghdr.what(image_path)

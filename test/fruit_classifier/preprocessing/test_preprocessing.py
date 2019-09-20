@@ -25,7 +25,7 @@ class TestPreprocessingUtils(unittest.TestCase):
         self.raw = cv2.imread(str(self.jpg_image_file_name))
 
         # Create a compressed version
-        self.comp = resize_image(self.raw)
+        self.comp = resize_image(self.raw, height=27, width=29)
 
     def tearDown(self):
         # Tear down the tmp_dir if it has been created

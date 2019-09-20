@@ -3,13 +3,16 @@ from pathlib import Path
 from google_images_download import google_images_download
 
 
-def main(categories=('bananas', 'apples', 'oranges'),
+def main(dataset_name='basic',
+         categories=('bananas', 'apples', 'oranges'),
          limit=700):
     """
     Scrapes google for the images given as categories
 
     Parameters
     ----------
+    dataset_name : str
+        Name of the dataset
     categories : array-like
         The categories to scrape
     limit : int
@@ -17,7 +20,7 @@ def main(categories=('bananas', 'apples', 'oranges'),
     """
 
     root_dir = Path(__file__).absolute().parents[2]
-    destination_dir = root_dir.joinpath('data', 'raw')
+    destination_dir = root_dir.joinpath('data', 'raw', dataset_name)
 
     if not destination_dir.is_dir():
         destination_dir.mkdir(parents=True, exist_ok=True)
@@ -42,6 +45,10 @@ def main(categories=('bananas', 'apples', 'oranges'),
 if __name__ == '__main__':
     # Construct the argument parse and parse the arguments
     parser = argparse.ArgumentParser(description='Scrape images')
+    parser.add_argument('-d',
+                        '--dataset_name',
+                        required=False,
+                        help='Name of the resulting dataset')
     parser.add_argument('-c',
                         '--categories',
                         nargs='+',
@@ -57,6 +64,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.categories is None:
+        dataset_name_ = 'basic'
+    else:
+        dataset_name_ = args.dataset_name
+
+    if args.categories is None:
         categories_ = ('bananas', 'apples', 'oranges')
     else:
         categories_ = args.categories
@@ -66,4 +78,4 @@ if __name__ == '__main__':
     else:
         limit_ = args.limit
 
-    main(categories_, limit_)
+    main(dataset_name_, categories_, limit_)
