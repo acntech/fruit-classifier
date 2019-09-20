@@ -10,8 +10,7 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
     resize_image
 
 
-# FIXME: Also need to enter the model name
-def main(image_path, model_files_dir, show_image=False):
+def main(image_path, model_files_dir, model_name, show_image=False):
     """
     Predict the class of an image
 
@@ -21,6 +20,10 @@ def main(image_path, model_files_dir, show_image=False):
         The image path as a string
     model_files_dir : Path
         Directory to the model files
+    model_name : str
+        Name of model
+        Will be loaded from
+        model_files_dir/models/model_name/model.h5
     show_image : bool
         Whether or not to use cv2.imshow to display the image
 
@@ -40,8 +43,7 @@ def main(image_path, model_files_dir, show_image=False):
     image = np.expand_dims(image, axis=0)
 
     # Load the trained convolutional neural network
-    # FIXME: Load correct_classifier based on input
-    model = load_classifier(model_files_dir)
+    model = load_classifier(model_files_dir, model_name)
 
     # Classify the input image
     labels, probabilities = classify(model, image, model_files_dir)
@@ -74,6 +76,10 @@ if __name__ == '__main__':
                         required=False,
                         default=None,
                         help='Path to the model files directory')
+    parser.add_argument('-n',
+                        '--model_name',
+                        required=False,
+                        help='Name of the resulting model')
     args = parser.parse_args()
 
     if args.model_files_dir is None:
@@ -83,4 +89,9 @@ if __name__ == '__main__':
     else:
         model_files_dir_ = args.model_files_dir
 
-    main(args.image, model_files_dir_, show_image=True)
+    if args.model_name is None:
+        model_name_ = 'basic'
+    else:
+        model_name_ = args.model_name
+
+    main(args.image, model_files_dir_, model_name_, show_image=True)

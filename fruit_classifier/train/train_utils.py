@@ -122,7 +122,7 @@ def get_model_input(data, labels, model_files_dir):
     return x_train, x_val, y_train, y_val
 
 
-def get_model(n_classes, model_setup, optimizer_setup):
+def get_model(n_classes, model_setup=None, optimizer_setup=None):
     """
     Returns a compiled model
 
@@ -130,8 +130,18 @@ def get_model(n_classes, model_setup, optimizer_setup):
     ----------
     n_classes : int
         Number of classes to use in the model
-    model_setup : dict
-        FIXME
+    model_setup : None or dict
+        Dictionary of model specific setup.
+        Must contain the key `model_type` with a string value
+        corresponding to one of the implemented models found in
+        fruit_classifier.models.factory.
+        The rest of the keys corresponds to model hyperparameters.
+        Valid parameters can be found in
+        fruit_classifier.models.models for a given `model_type`.
+        If set to None, defaults will be used
+    optimizer_setup : None or dict
+        Dictionary for optimizer setup.
+        Currently only `initial_learning_rate` and `epochs` can be set
 
     Returns
     -------
@@ -141,7 +151,6 @@ def get_model(n_classes, model_setup, optimizer_setup):
 
     print('[INFO] compiling model...')
 
-    # FIXME: get parameters elsewhere
     if model_setup is None:
         model_setup = dict(model_type='leNet',
                            width=28,
@@ -149,6 +158,9 @@ def get_model(n_classes, model_setup, optimizer_setup):
                            channels=3)
 
     model_type = model_setup.pop('model_type')
+
+    model_setup['classes'] = n_classes
+    model = ModelFactory.create_model(model_type, model_setup)
 
     # FIXME: Enable setup knobs outside of just initial_learning rate
     #        and epochs
@@ -158,8 +170,6 @@ def get_model(n_classes, model_setup, optimizer_setup):
 
     initial_learning_rate = optimizer_setup['initial_learning_rate']
     epochs = optimizer_setup['epochs']
-
-    model = ModelFactory.create_model(model_type, model_setup)
 
     opt = Adam(lr=initial_learning_rate,
                decay=initial_learning_rate / epochs)

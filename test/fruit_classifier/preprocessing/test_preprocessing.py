@@ -19,7 +19,7 @@ class TestPreprocessingUtils(unittest.TestCase):
 
         # Correct dimensions
         self.test_raw_shape = [115, 73, 3]
-        self.test_comp_shape = [28, 28, 3]
+        self.test_comp_shape = [27, 29, 3]
 
         # Read test image from file
         self.raw = cv2.imread(str(self.jpg_image_file_name))

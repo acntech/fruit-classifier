@@ -1,6 +1,7 @@
 import argparse
 import pickle
 import random
+import json
 from pathlib import Path
 from fruit_classifier.utils.image_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
@@ -15,7 +16,7 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
 def main(dataset_name='basic',
          model_name='basic',
          model_setup=None,
-         ):
+         optimizer_setup=None):
     """
     This is the main module for training the fruit-classifier
 
@@ -41,7 +42,12 @@ def main(dataset_name='basic',
         fruit_classifier.models.factory.
         The rest of the keys corresponds to model hyperparameters.
         Valid parameters can be found in
-        fruit_classifier.models.models for a given `model_type`
+        fruit_classifier.models.models for a given `model_type`.
+        If set to None, defaults will be used
+    optimizer_setup : None or dict
+        Dictionary for optimizer setup.
+        See input parameters of
+        fruit_classifier.train.train_utils.get_model for details
     """
 
     root_dir = Path(__file__).absolute().parents[2]
@@ -74,8 +80,7 @@ def main(dataset_name='basic',
     image_generator = get_image_generator()
 
     # Initialize the model
-    # FIXME: leNet hardcoded
-    model = get_model(len(set(labels)), model_setup)
+    model = get_model(len(set(labels)), model_setup, optimizer_setup)
 
     # Train the network
     history = train_model(model,
@@ -97,13 +102,27 @@ if __name__ == '__main__':
     parser.add_argument('-d',
                         '--dataset_name',
                         required=False,
+                        default=None,
                         help='Name of the resulting dataset')
     parser.add_argument('-m',
                         '--model_name',
                         required=False,
+                        default=None,
                         help='Name of the resulting model')
-
-    # FIXME: Allow for model_setup
+    parser.add_argument('-s',
+                        '--model_setup',
+                        required=False,
+                        default=None,
+                        type=json.loads,
+                        help='Model setup as a json string. I.e. in '
+                             'the form {"key1": val1, "key2": val2}')
+    parser.add_argument('-o',
+                        '--optimizer_setup',
+                        required=False,
+                        default=None,
+                        type=json.loads,
+                        help='Optimizer setup as a json string. I.e. '
+                             'in the form {"key1": val1, "key2": val2}')
 
     args = parser.parse_args()
 
@@ -117,4 +136,7 @@ if __name__ == '__main__':
     else:
         model_name_ = args.model_name
 
-    main(dataset_name_, model_name_)
+    main(dataset_name_,
+         model_name_,
+         args.model_setup,
+         args.optimizer_setup)

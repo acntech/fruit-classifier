@@ -43,7 +43,8 @@ class TestTrainUtils(unittest.TestCase):
         self.image_paths = get_image_paths(self.tmp_dir)
 
         # Set number of epochs globally
-        self.num_intended_epochs = 2
+        self.optimizer_setup = dict(initial_learning_rate=1e-3,
+                                    epochs=2)
 
     def test_get_image_paths(self):
         # Run get_image_paths() and verify outputs
@@ -100,7 +101,7 @@ class TestTrainUtils(unittest.TestCase):
     def test_get_model(self):
         # Run get_model and verify outputs
         model = get_model(self.n_classes,
-                          epochs=self.num_intended_epochs)
+                          optimizer_setup=self.optimizer_setup)
         self.assertTrue(model._built)
 
     def test_train_model(self):
@@ -117,7 +118,7 @@ class TestTrainUtils(unittest.TestCase):
         image_generator = get_image_generator()
 
         model = get_model(self.n_classes,
-                          epochs=self.num_intended_epochs)
+                          optimizer_setup=self.optimizer_setup)
 
         history = train_model(model,
                               image_generator,
@@ -126,9 +127,9 @@ class TestTrainUtils(unittest.TestCase):
                               y_train,
                               x_val,
                               y_val,
-                              epochs=self.num_intended_epochs)
+                              epochs=self.optimizer_setup['epochs'])
         num_epochs = history.params['epochs']
-        self.assertEqual(num_epochs, self.num_intended_epochs)
+        self.assertEqual(num_epochs, self.optimizer_setup['epochs'])
 
     def test_plot_training(self):
         # Run plot_training and verify it does not crash
