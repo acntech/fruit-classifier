@@ -80,6 +80,12 @@ def main(dataset_name='basic',
     image_generator = get_image_generator()
 
     # Initialize the model
+    if model_setup is None:
+        model_setup = dict()
+
+    model_setup['height'],\
+        model_setup['width'],\
+        model_setup['channels'] = x_train.shape[1:]
     model = get_model(len(set(labels)), model_setup, optimizer_setup)
 
     # Train the network

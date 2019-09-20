@@ -36,8 +36,6 @@ def main(dataset_name='basic', height=28, width=28):
 
     copy_valid_images(raw_dir, interim_dir)
 
-    # FIXME: Resize based on input
-    # FIXME: Shape must reflect shape in model
     resize_images(interim_dir, height, width)
 
 

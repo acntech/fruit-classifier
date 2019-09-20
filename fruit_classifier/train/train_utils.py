@@ -156,6 +156,9 @@ def get_model(n_classes, model_setup=None, optimizer_setup=None):
                            width=28,
                            height=28,
                            channels=3)
+    elif 'model_type' not in model_setup.keys():
+        # If only width, height, channels is given
+        model_setup['model_type'] = 'leNet'
 
     model_type = model_setup.pop('model_type')
 
