@@ -77,7 +77,7 @@ def classify(model, images, model_file_dir):
     return labels, probabilities
 
 
-def load_classifier(model_file_dir):
+def load_classifier(model_file_dir, model_name='basic'):
     """
     Loads the classifier
 
@@ -85,6 +85,8 @@ def load_classifier(model_file_dir):
     ----------
     model_file_dir : Path
         Path to the model files directory
+    model_name : str
+        Name of the model
 
     Returns
     -------
@@ -94,7 +96,9 @@ def load_classifier(model_file_dir):
 
     print('[INFO] loading network...')
 
-    model_path = model_file_dir.joinpath('models', 'model.h5')
+    model_path = model_file_dir.joinpath('models',
+                                         model_name,
+                                         'model.h5')
     model = load_model(str(model_path))
 
     return model

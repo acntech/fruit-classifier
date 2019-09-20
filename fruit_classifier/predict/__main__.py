@@ -10,6 +10,7 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
     resize_image
 
 
+# FIXME: Also need to enter the model name
 def main(image_path, model_files_dir, show_image=False):
     """
     Predict the class of an image
@@ -39,6 +40,7 @@ def main(image_path, model_files_dir, show_image=False):
     image = np.expand_dims(image, axis=0)
 
     # Load the trained convolutional neural network
+    # FIXME: Load correct_classifier based on input
     model = load_classifier(model_files_dir)
 
     # Classify the input image

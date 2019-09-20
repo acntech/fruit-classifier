@@ -1,3 +1,4 @@
+import argparse
 import pickle
 import random
 from pathlib import Path
@@ -11,7 +12,10 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
     get_image_generator
 
 
-def main():
+def main(dataset_name='basic',
+         model_name='basic',
+         model_setup=None,
+         ):
     """
     This is the main module for training the fruit-classifier
 
@@ -21,14 +25,31 @@ def main():
     3. Initialize a model
     4. Train the model
     5. Plot the training
+
+    Parameters
+    ----------
+    dataset_name : str
+        Dataset to train from
+    model_name : str
+        Name of model
+        The model will be stored in
+        model_files/models/model_name/model.h5
+    model_setup : None or dict
+        Dictionary of model specific setup.
+        Must contain the key `model_type` with a string value
+        corresponding to one of the implemented models found in
+        fruit_classifier.models.factory.
+        The rest of the keys corresponds to model hyperparameters.
+        Valid parameters can be found in
+        fruit_classifier.models.models for a given `model_type`
     """
 
     root_dir = Path(__file__).absolute().parents[2]
     data_dir = root_dir.joinpath('data')
-    interim_dir = data_dir.joinpath('interim')
-    processed_dir = data_dir.joinpath('processed')
+    interim_dir = data_dir.joinpath('interim', dataset_name)
+    processed_dir = data_dir.joinpath('processed', dataset_name)
     model_files_dir = root_dir.joinpath('model_files')
-    plot_dir = root_dir.joinpath('reports', 'figures')
+    plot_dir = root_dir.joinpath('reports', 'figures', model_name)
 
     # Grab the image paths and randomly shuffle them
     image_paths = get_image_paths(interim_dir)
@@ -53,7 +74,8 @@ def main():
     image_generator = get_image_generator()
 
     # Initialize the model
-    model = get_model(len(set(labels)))
+    # FIXME: leNet hardcoded
+    model = get_model(len(set(labels)), model_setup)
 
     # Train the network
     history = train_model(model,
@@ -62,11 +84,37 @@ def main():
                           x_train,
                           y_train,
                           x_val,
-                          y_val)
+                          y_val,
+                          model_name)
 
     # Plot the training loss and accuracy
     plot_training(history, plot_dir)
 
 
 if __name__ == '__main__':
-    main()
+    # Construct the argument parse and parse the arguments
+    parser = argparse.ArgumentParser(description='Preprocess a dataset')
+    parser.add_argument('-d',
+                        '--dataset_name',
+                        required=False,
+                        help='Name of the resulting dataset')
+    parser.add_argument('-m',
+                        '--model_name',
+                        required=False,
+                        help='Name of the resulting model')
+
+    # FIXME: Allow for model_setup
+
+    args = parser.parse_args()
+
+    if args.dataset_name is None:
+        dataset_name_ = 'basic'
+    else:
+        dataset_name_ = args.dataset_name
+
+    if args.model_name is None:
+        model_name_ = 'basic'
+    else:
+        model_name_ = args.model_name
+
+    main(dataset_name_, model_name_)

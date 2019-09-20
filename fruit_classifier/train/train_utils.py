@@ -122,12 +122,7 @@ def get_model_input(data, labels, model_files_dir):
     return x_train, x_val, y_train, y_val
 
 
-def get_model(n_classes,
-              width=28,
-              height=28,
-              channels=3,
-              initial_learning_rate=1e-3,
-              epochs=25):
+def get_model(n_classes, model_setup, optimizer_setup):
     """
     Returns a compiled model
 
@@ -135,16 +130,8 @@ def get_model(n_classes,
     ----------
     n_classes : int
         Number of classes to use in the model
-    width : int
-        The pixel width of the images
-    height : int
-        The pixel height of the images
-    channels : int
-        The number of channels in the image
-    initial_learning_rate : float
-        The initial learning rate for the optimizer
-    epochs : int
-        The number of epochs
+    model_setup : dict
+        FIXME
 
     Returns
     -------
@@ -155,11 +142,24 @@ def get_model(n_classes,
     print('[INFO] compiling model...')
 
     # FIXME: get parameters elsewhere
-    setup = dict(height=height,
-                 width=width,
-                 channels=channels,
-                 classes=n_classes)
-    model = ModelFactory.create_model('leNet', setup)
+    if model_setup is None:
+        model_setup = dict(model_type='leNet',
+                           width=28,
+                           height=28,
+                           channels=3)
+
+    model_type = model_setup.pop('model_type')
+
+    # FIXME: Enable setup knobs outside of just initial_learning rate
+    #        and epochs
+    if optimizer_setup is None:
+        optimizer_setup = dict(initial_learning_rate=1e-3,
+                               epochs=25)
+
+    initial_learning_rate = optimizer_setup['initial_learning_rate']
+    epochs = optimizer_setup['epochs']
+
+    model = ModelFactory.create_model(model_type, model_setup)
 
     opt = Adam(lr=initial_learning_rate,
                decay=initial_learning_rate / epochs)
@@ -178,6 +178,7 @@ def train_model(model,
                 y_train,
                 x_val,
                 y_val,
+                model_name='basic',
                 batch_size=32,
                 epochs=25):
     """
@@ -199,6 +200,8 @@ def train_model(model,
         The training labels
     y_val : np.array, shape (n_val,)
         The validation labels
+    model_name : str
+        Name of the model
     batch_size : int
         The batch size
     epochs : int
@@ -231,7 +234,7 @@ def train_model(model,
     # Save the model to disk
     print('[INFO] Serializing network...')
 
-    model_dir = model_files_dir.joinpath('models')
+    model_dir = model_files_dir.joinpath('models', model_name)
     model_path = model_dir.joinpath('model.h5')
 
     if not model_dir.is_dir():
