@@ -116,6 +116,7 @@ dmypy.json
 # Own
 *.swp
 *.swo
+*.bak
 .idea/
 .DS_Store
 backup/
