@@ -3,9 +3,14 @@ from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.layers import Flatten
 from keras.layers import Dense
+from keras.layers import Dropout
 
 
-def lenet(height=28, width=28, channels=3, classes=3):
+def lenet(height=28,
+          width=28,
+          channels=3,
+          classes=3,
+          dropout=0.0):
     """
     Implementation of a LeNet like architecture with input (h, w, c)
 
@@ -42,12 +47,14 @@ def lenet(height=28, width=28, channels=3, classes=3):
     model.add(MaxPooling2D(pool_size=(2, 2),
                            strides=(2, 2)))
 
+    model.add(Dropout(dropout))
     model.add(Conv2D(50,
                      (5, 5),
                      padding='same'))
     model.add(MaxPooling2D(pool_size=(2, 2),
                            strides=(2, 2)))
 
+    model.add(Dropout(dropout))
     model.add(Flatten())
     model.add(Dense(500, activation='relu'))
     model.add(Dense(classes, activation='softmax'))
