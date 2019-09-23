@@ -67,7 +67,7 @@ def get_data_and_labels(image_paths, processed_dir):
     return data, labels
 
 
-def get_model_input(data, labels, model_files_dir):
+def get_model_input(data, labels, model_files_dir, model_name):
     """
     Returns the input to the model
 
@@ -79,6 +79,8 @@ def get_model_input(data, labels, model_files_dir):
         The corresponding labels
     model_files_dir : Path
         Path to the model files
+    model_name : str
+        Name of model
 
     Returns
     -------
@@ -96,7 +98,7 @@ def get_model_input(data, labels, model_files_dir):
     label_encoder.fit(labels)
     encoded_labels = label_encoder.transform(labels)
 
-    encoder_dir = model_files_dir.joinpath('encoders')
+    encoder_dir = model_files_dir.joinpath('encoders', model_name)
     if not encoder_dir.is_dir():
         encoder_dir.mkdir(parents=True, exist_ok=True)
 

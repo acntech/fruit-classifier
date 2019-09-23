@@ -42,7 +42,7 @@ def draw_class_on_image(image, probability_text):
     return output_image
 
 
-def classify(model, images, model_file_dir):
+def classify(model, images, model_file_dir, model_name):
     """
     Classifies a images and returns the labels and probabilities
 
@@ -54,6 +54,8 @@ def classify(model, images, model_file_dir):
         The images to predict
     model_file_dir : Path
         Directory to the model files
+    model_name : str
+        Name of model
 
     Returns
     -------
@@ -67,7 +69,9 @@ def classify(model, images, model_file_dir):
     labels = np.argmax(probabilities, axis=1)
 
     # Load the label encoder
-    encoder_path = model_file_dir.joinpath('encoders', 'encoder.pkl')
+    encoder_path = model_file_dir.joinpath('encoders',
+                                           model_name,
+                                           'encoder.pkl')
 
     with encoder_path.open('rb') as f:
         label_encoder = pickle.load(f)

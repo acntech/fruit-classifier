@@ -74,7 +74,7 @@ def main(dataset_name='basic',
         data, labels = get_data_and_labels(image_paths, processed_dir)
 
     x_train, x_val, y_train, y_val = \
-        get_model_input(data, labels, model_files_dir)
+        get_model_input(data, labels, model_files_dir, model_name)
 
     # Construct the image generator for data augmentation
     image_generator = get_image_generator()
@@ -83,9 +83,17 @@ def main(dataset_name='basic',
     if model_setup is None:
         model_setup = dict()
 
+    # Infer some of the setup to use in the models
     model_setup['height'],\
         model_setup['width'],\
         model_setup['channels'] = x_train.shape[1:]
+
+    # FIXME: This is also done in get_model :/
+    if optimizer_setup is None:
+        optimizer_setup = dict(initial_learning_rate=1e-3,
+                               epochs=2,
+                               batch_size=32)
+
     model = get_model(len(set(labels)), model_setup, optimizer_setup)
 
     # Train the network
@@ -96,7 +104,9 @@ def main(dataset_name='basic',
                           y_train,
                           x_val,
                           y_val,
-                          model_name)
+                          model_name,
+                          batch_size=optimizer_setup['batch_size'],
+                          epochs=optimizer_setup['epochs'])
 
     # Plot the training loss and accuracy
     plot_training(history, plot_dir)

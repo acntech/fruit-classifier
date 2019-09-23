@@ -46,7 +46,10 @@ def main(image_path, model_files_dir, model_name, show_image=False):
     model = load_classifier(model_files_dir, model_name)
 
     # Classify the input image
-    labels, probabilities = classify(model, image, model_files_dir)
+    labels, probabilities = classify(model,
+                                     image,
+                                     model_files_dir,
+                                     model_name)
     label = labels[0]
     probability = np.max(probabilities[0])
 

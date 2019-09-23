@@ -25,18 +25,20 @@ def main(dataset_name='basic', height=28, width=28):
 
     data_dir = \
         Path(__file__).absolute().parents[2].joinpath('data')
-    raw_dir = data_dir.joinpath('raw')
+    raw_dir = data_dir.joinpath('raw', dataset_name)
     interim_dir = data_dir.joinpath('interim', dataset_name)
 
-    # Shorten filenames if they are so long that Windows protests
-    truncate_filenames(raw_dir)
-
     if not interim_dir.is_dir():
+
+        # Shorten filenames if they are so long that Windows protests
+        truncate_filenames(raw_dir)
+
         interim_dir.mkdir(parents=True, exist_ok=True)
-
-    copy_valid_images(raw_dir, interim_dir)
-
-    resize_images(interim_dir, height, width)
+        copy_valid_images(raw_dir, interim_dir)
+        resize_images(interim_dir, height, width)
+    else:
+        print(f'[WARN] directory found in {interim_dir}, '
+              f'no preprocessing performed')
 
 
 if __name__ == '__main__':
@@ -46,7 +48,7 @@ if __name__ == '__main__':
                         '--dataset_name',
                         required=False,
                         help='Name of the resulting dataset')
-    parser.add_argument('-h',
+    parser.add_argument('-e',
                         '--height',
                         default=28,
                         help='Height of the resized images')
@@ -61,4 +63,4 @@ if __name__ == '__main__':
     else:
         dataset_name_ = args.dataset_name
 
-    main(dataset_name_, args.width, args.heigth)
+    main(dataset_name_, args.width, args.height)
