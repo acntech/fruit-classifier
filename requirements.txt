@@ -10,3 +10,4 @@ tensorflow
 flask
 werkzeug
 sacred
+pymongo

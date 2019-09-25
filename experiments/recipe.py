@@ -19,7 +19,7 @@ from experiments.utils import log_history
 ex = Experiment()
 ex.observers.append(
     MongoObserver.create(
-        url=(f'mongodb://sample:password@localhost:27017/'
+        url=(f'mongodb://sample:password@mongo:27017/'
              f'?authMechanism=SCRAM-SHA-1'),
         db_name='db'))
 
@@ -86,8 +86,11 @@ def experiment_recipe(**_):
     # Add to sacred
     log_history(ex, history)
     ex.add_artifact(str(cm_path), name=cm_path.name)
-    ex.add_config({'cohens_kappa':
-                   cohen_kappa_score(y_true_sorted, y_pred_sorted)})
+    cohen_kappa = cohen_kappa_score(y_true_sorted, y_pred_sorted)
+
+    # Add twice to make visible
+    ex.log_scalar('cohens_kappa', cohen_kappa)
+    ex.log_scalar('cohens_kappa', cohen_kappa)
 
     # Will appear as "Result in omniboard"
     return accuracy_score(y_true_sorted, y_pred_sorted)

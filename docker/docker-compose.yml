@@ -9,6 +9,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: sample
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: db
+    volumes:
+      - ./../data/db:/data/db
     expose:
       - 27017
     networks:
@@ -24,5 +26,20 @@ services:
     depends_on:
       - mongo
 
+  fruit_classifier:
+    image: loeiten/fruit_classifier:latest
+    command: ["-m", "app"]
+    ports:
+      - 0.0.0.0:5000:5000
+    volumes:
+      - ./../data:/fruit-classifier/data
+      - ./../model_files:/fruit-classifier/model_files
+      - ./../reports:/fruit-classifier/reports
+    networks:
+      - omniboard
+    depends_on:
+      - omniboard
+
 networks:
   omniboard:
+    driver: bridge

@@ -143,8 +143,8 @@ class TestTrainUtils(unittest.TestCase):
         history = History
         history.history = dict(loss=(1, 2),
                                val_loss=(1, 2),
-                               acc=(1, 2),
-                               val_acc=(1, 2),)
+                               accuracy=(1, 2),
+                               val_accuracy=(1, 2),)
         plot_training(history, self.plot_dir)
 
     def tearDown(self):

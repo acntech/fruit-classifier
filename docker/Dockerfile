@@ -12,6 +12,7 @@
 FROM ubuntu:18.04
 
 # Intall apt dependencies
+RUN echo "hello"
 RUN apt-get -yqq update
 RUN apt-get -yqq upgrade
 RUN apt-get -yqq install python3

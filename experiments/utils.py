@@ -99,8 +99,8 @@ def log_history(ex, history):
         The training History object containing
         - loss
         - val_loss
-        - acc
-        - val_acc
+        - accuracy
+        - val_accuracy
 
     References
     ----------
@@ -111,9 +111,9 @@ def log_history(ex, history):
     h = history.history
 
     for loss, acc, val_loss, val_acc in zip(h['loss'],
-                                            h['acc'],
+                                            h['accuracy'],
                                             h['val_loss'],
-                                            h['val_acc']):
+                                            h['val_accuracy']):
         ex.log_scalar('loss', loss)
         ex.log_scalar('acc', acc)
         ex.log_scalar('val_loss', val_loss)

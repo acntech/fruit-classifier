@@ -384,8 +384,8 @@ def train_model(model,
         History object containing
         - loss
         - val_loss
-        - acc
-        - val_acc
+        - accuracy
+        - val_accuracy
     """
 
     print('[INFO] Training network...')
@@ -429,8 +429,8 @@ def plot_training(history, plot_dir, plot_name='last'):
         History object containing
         - loss
         - val_loss
-        - acc
-        - val_acc
+        - accuracy
+        - val_accuracy
     plot_dir : Path
         Directory where to store the plot
     plot_name : str
@@ -444,10 +444,10 @@ def plot_training(history, plot_dir, plot_name='last'):
                                                       'loss')
     plt.plot(n_epochs, history.history['val_loss'], label='Validation '
                                                           'loss')
-    plt.plot(n_epochs, history.history['acc'],
+    plt.plot(n_epochs, history.history['accuracy'],
              label='Training accuracy')
-    plt.plot(n_epochs, history.history['val_acc'], label='Validation '
-                                                         'accuracy')
+    plt.plot(n_epochs, history.history['val_accuracy'],
+             label='Validation accuracy')
     plt.title('Training Loss and Accuracy for fruit classifier')
     plt.xlabel('Epoch #')
     plt.ylabel('Loss/Accuracy')
