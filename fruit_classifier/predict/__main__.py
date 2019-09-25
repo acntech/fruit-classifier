@@ -2,8 +2,9 @@ import argparse
 import cv2
 import numpy as np
 from pathlib import Path
+from fruit_classifier.predict.predict_utils import classify_many
 from fruit_classifier.predict.predict_utils import draw_class_on_image
-from fruit_classifier.predict.predict_utils import classify
+from fruit_classifier.predict.predict_utils import inverse_encode
 from fruit_classifier.predict.predict_utils import load_classifier
 from fruit_classifier.utils.image_utils import open_image
 from fruit_classifier.preprocessing.preprocessing_utils import \
@@ -42,14 +43,10 @@ def main(image_path, model_files_dir, model_name, show_image=False):
     # Expand the dimension (i.e. make the batch size = 1)
     image = np.expand_dims(image, axis=0)
 
-    # Load the trained convolutional neural network
     model = load_classifier(model_files_dir, model_name)
+    labels, probabilities = classify_many(model, image)
+    labels = inverse_encode(labels, model_files_dir, model_name)
 
-    # Classify the input image
-    labels, probabilities = classify(model,
-                                     image,
-                                     model_files_dir,
-                                     model_name)
     label = labels[0]
     probability = np.max(probabilities[0])
 

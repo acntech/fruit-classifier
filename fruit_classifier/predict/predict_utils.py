@@ -42,7 +42,7 @@ def draw_class_on_image(image, probability_text):
     return output_image
 
 
-def classify(model, images, model_file_dir, model_name):
+def classify_many(model, images):
     """
     Classifies a images and returns the labels and probabilities
 
@@ -52,42 +52,54 @@ def classify(model, images, model_file_dir, model_name):
         The model to predict from
     images : np.array (examples,  height, width, channels)
         The images to predict
-    model_file_dir : Path
-        Directory to the model files
-    model_name : str
-        Name of model
 
     Returns
     -------
-    labels : np.array, shape (examples, )
+    labels : np.array, shape (examples, n_classes)
         The labels with the highest probability
     probabilities : np.array, shape (examples, n_classes)
         The probabilities of all the classes according to the label
         encoder
     """
+
     probabilities = model.predict(images)
     labels = np.argmax(probabilities, axis=1)
-
-    # Load the label encoder
-    encoder_path = model_file_dir.joinpath('encoders',
-                                           model_name,
-                                           'encoder.pkl')
-
-    with encoder_path.open('rb') as f:
-        label_encoder = pickle.load(f)
-
-    labels = label_encoder.inverse_transform(labels)
 
     return labels, probabilities
 
 
-def load_classifier(model_file_dir, model_name='basic'):
+def inverse_encode(labels, model_files_dir, model_name):
+    """
+    Inverse encodes the labels
+
+    Parameters
+    ----------
+    labels
+    model_files_dir
+    model_name
+
+    Returns
+    -------
+
+    """
+    # Load the label encoder
+    encoder_path = model_files_dir.joinpath('encoders',
+                                           model_name,
+                                           'encoder.pkl')
+    with encoder_path.open('rb') as f:
+        label_encoder = pickle.load(f)
+    labels = label_encoder.inverse_transform(labels)
+
+    return labels
+
+
+def load_classifier(model_files_dir, model_name='basic'):
     """
     Loads the classifier
 
     Parameters
     ----------
-    model_file_dir : Path
+    model_files_dir : Path
         Path to the model files directory
     model_name : str
         Name of the model
@@ -95,12 +107,12 @@ def load_classifier(model_file_dir, model_name='basic'):
     Returns
     -------
     model : Sequential
-        The model to classify from
+        The model to classify_many from
     """
 
     print('[INFO] loading network...')
 
-    model_path = model_file_dir.joinpath('models',
+    model_path = model_files_dir.joinpath('models',
                                          model_name,
                                          'model.h5')
     model = load_model(str(model_path))
