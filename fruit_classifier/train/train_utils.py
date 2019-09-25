@@ -4,7 +4,6 @@ from pathlib import Path
 from tqdm import tqdm
 from keras.optimizers import Adam
 from keras.preprocessing.image import ImageDataGenerator
-from keras.utils import to_categorical
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -12,7 +11,7 @@ from fruit_classifier.models.factory import ModelFactory
 from fruit_classifier.utils.image_utils import open_image
 
 
-def get_data_and_labels(image_paths, processed_dir):
+def get_data_and_labels(image_paths):
     """
     Returns the data and the labels from the input paths
 
@@ -20,14 +19,12 @@ def get_data_and_labels(image_paths, processed_dir):
     ----------
     image_paths : list
         List of Paths of the image paths
-    processed_dir : Path
-        Path to the directory where the final datasets are stored
 
     Returns
     -------
     data : np.array, shape (len(image_paths), height, width, channels)
         The images as numpy array
-    labels : np.array, shape (len(image_paths,)
+    labels : np.array, shape (len(image_paths,))
         The corresponding labels
     """
 
@@ -48,28 +45,40 @@ def get_data_and_labels(image_paths, processed_dir):
     data = np.array(data, dtype='float')/255
     labels = np.array(labels)
 
+    return data, labels
+
+
+def store_data_and_labels(data, labels, processed_dir):
+    """
+    Store the dataset and label
+
+    Parameters
+    ----------
+    processed_dir : Path
+        Path to the directory where the final datasets are stored
+    data : np.array, shape (len(image_paths), height, width, channels)
+        The images as numpy array
+    labels : np.array, shape (len(image_paths,))
+        The corresponding labels
+    """
     # Pickle the data and labels
     if not processed_dir.is_dir():
         processed_dir.mkdir(parents=True, exist_ok=True)
 
     data_path = processed_dir.joinpath('data.pkl')
-
     with data_path.open('wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
         print('[INFO] Saved to {}'.format(data_path))
 
     labels_path = processed_dir.joinpath('labels.pkl')
-
     with labels_path.open('wb') as f:
         pickle.dump(labels, f, pickle.HIGHEST_PROTOCOL)
         print('[INFO] Saved to {}'.format(labels_path))
 
-    return data, labels
 
-
-def get_model_input(data, labels, model_files_dir, model_name):
+def get_data_split(data, labels):
     """
-    Returns the input to the model
+    Splits the data in train and test (or validation)
 
     Parameters
     ----------
@@ -77,10 +86,44 @@ def get_model_input(data, labels, model_files_dir, model_name):
         The images as a numpy array
     labels : np.array, shape (n_images,)
         The corresponding labels
+
+    Returns
+    -------
+    x_train : np.array, shape (n_train, height, width, channels)
+        The training data
+    x_test : np.array, shape (n_test, height, width, channels)
+        The test or validation data
+    y_train : np.array, shape (n_train, n_classes)
+        The training labels
+    y_test : np.array, shape (n_test, n_classes)
+        The test or validation labels
+    """
+
+    # Partition the data into training and testing splits using 75% of
+    # the data for training and the remaining 25% for validation
+    (x_train, x_test, y_train, y_test) = \
+        train_test_split(data, labels, test_size=0.25, random_state=42)
+
+    return x_train, x_test, y_train, y_test
+
+
+def get_processed_data(image_paths,
+                       model_files_dir,
+                       model_name,
+                       processed_dir):
+    """
+    Returns the processed data
+
+    Parameters
+    ----------
+    image_paths : list
+        List of Paths of the image paths
     model_files_dir : Path
-        Path to the model files
+        Path to the model_files
     model_name : str
-        Name of model
+        Name of the model
+    processed_dir : Path
+        Path to the processed directory
 
     Returns
     -------
@@ -88,40 +131,151 @@ def get_model_input(data, labels, model_files_dir, model_name):
         The training data
     x_val : np.array, shape (n_val, height, width, channels)
         The validation data
-    y_train : np.array, shape (n_train,)
+    test_data: np.array, shape (n_test, height, width, channels)
+        The test data
+    y_train : np.array, shape (n_train, n_classes)
         The training labels
-    y_val : np.array, shape (n_val,)
+    y_val : np.array, shape (n_val, n_classes)
         The validation labels
+    test_labels : np.array, shape (n_test, n_classes)
+        The test labels
     """
 
+    if processed_dir.joinpath('data.pkl').is_file():
+        x_train, x_val, x_test, y_train, y_val, y_test =\
+            load_data_sets(processed_dir)
+    else:
+        data, labels = get_data_and_labels(image_paths)
+        store_data_and_labels(data, labels, processed_dir)
+
+        encoded_labels = encode_labels(labels,
+                                       model_files_dir,
+                                       model_name)
+        train_data, x_test, train_labels, y_test = \
+            get_data_split(data, encoded_labels)
+
+        x_train, x_val, y_train, y_val = \
+            get_data_split(train_data, train_labels)
+
+        store_data_sets(x_train,
+                        x_val,
+                        x_test,
+                        y_train,
+                        y_val,
+                        y_test,
+                        processed_dir)
+
+    return x_train, x_val, x_test, y_train, y_val, y_test
+
+
+def store_data_sets(x_train,
+                    x_val,
+                    x_test,
+                    y_train,
+                    y_val,
+                    y_test,
+                    processed_dir):
+    """
+    Saves and returns the train and the test
+
+    Parameters
+    ----------
+    x_train : np.array, shape (n_train, height, width, channels)
+        The training data
+    x_val : np.array, shape (n_val, height, width, channels)
+        The validation data
+    x_test: np.array, shape (n_test, height, width, channels)
+        The test data
+    y_train : np.array, shape (n_train, n_classes)
+        The training labels
+    y_val : np.array, shape (n_val, n_classes)
+        The validation labels
+    y_test : np.array, shape (n_test, n_classes)
+        The test labels
+    processed_dir : Path
+        Path to the processed directory
+    """
+
+    data_sets = (x_train, x_val, x_test, y_train, y_val, y_test)
+    names = ('x_train', 'x_val', 'x_test', 'y_train', 'y_val', 'y_test')
+
+    for data_set, name in zip(data_sets, names):
+        path = processed_dir.joinpath(f'{name}.pkl')
+        with path.open('wb') as f:
+            pickle.dump(data_set, f, pickle.HIGHEST_PROTOCOL)
+            print('[INFO] Saved to {}'.format(path))
+
+
+def load_data_sets(processed_dir):
+    """
+    Saves and returns the train and the test
+
+    Parameters
+    ----------
+    processed_dir : Path
+        Path to the processed directory
+
+    Returns
+    -------
+    x_train : np.array, shape (n_train, height, width, channels)
+        The training data
+    x_val : np.array, shape (n_val, height, width, channels)
+        The validation data
+    x_test: np.array, shape (n_test, height, width, channels)
+        The test data
+    y_train : np.array, shape (n_train, n_classes)
+        The training labels
+    y_val : np.array, shape (n_val, n_classes)
+        The validation labels
+    y_test : np.array, shape (n_val, n_classes)
+        The test labels
+    """
+
+    names = ('x_train', 'x_val', 'x_test', 'y_train', 'y_val', 'y_test')
+    data_sets = list()
+
+    for name in names:
+        path = processed_dir.joinpath(f'{name}.pkl')
+        with path.open('rb') as f:
+            data_sets.append(pickle.load(f))
+
+    x_train, x_val, x_test, y_train, y_val, y_test = data_sets
+
+    return x_train, x_val, x_test, y_train, y_val, y_test
+
+
+def encode_labels(labels, model_files_dir, model_name):
+    """
+    Encode the labels
+
+    Parameters
+    ----------
+    labels : np.array, shape (n_labels,)
+        The labels to encode
+    model_files_dir : Path
+        Path to the model_files
+    model_name : str
+        Name of the model
+
+    Returns
+    -------
+    encoded_labels : np.array, shape (n_labels, n_classes)
+        The encoded labels
+    """
     label_encoder = LabelEncoder()
     label_encoder.fit(labels)
     encoded_labels = label_encoder.transform(labels)
-
     encoder_dir = model_files_dir.joinpath('encoders', model_name)
+
     if not encoder_dir.is_dir():
         encoder_dir.mkdir(parents=True, exist_ok=True)
-
     encoder_path = encoder_dir.joinpath('encoder.pkl')
 
     with encoder_path.open('wb') as f:
         pickle.dump(label_encoder, f, pickle.HIGHEST_PROTOCOL)
         print('[INFO] Saved to {}'.format(encoder_path))
 
-    num_classes = len(set(labels))
-
-    # Partition the data into training and testing splits using 75% of
-    # the data for training and the remaining 25% for testing
-    (x_train, x_val, y_train, y_val) = train_test_split(data,
-                                                        encoded_labels,
-                                                        test_size=0.25,
-                                                        random_state=42)
-
-    # Convert the labels from integers to vectors
-    y_train = to_categorical(y_train, num_classes=num_classes)
-    y_val = to_categorical(y_val, num_classes=num_classes)
-
-    return x_train, x_val, y_train, y_val
+    return encoded_labels
 
 
 def get_model(n_classes, model_setup=None, optimizer_setup=None):
@@ -261,7 +415,7 @@ def train_model(model,
     return history
 
 
-def plot_training(history, plot_dir):
+def plot_training(history, plot_dir, plot_name='last'):
     """
     Plots the training loss and accuracy
 
@@ -277,6 +431,8 @@ def plot_training(history, plot_dir):
         - val_acc
     plot_dir : Path
         Directory where to store the plot
+    plot_name : str
+        Name of plot
     """
 
     plt.style.use('ggplot')
@@ -298,7 +454,7 @@ def plot_training(history, plot_dir):
     if not plot_dir.is_dir():
         plot_dir.mkdir(parents=True, exist_ok=True)
 
-    plot_path = plot_dir.joinpath('training_history.png')
+    plot_path = plot_dir.joinpath(f'{plot_name}_training_history.png')
 
     plt.savefig(str(plot_path))
     print('[INFO] Saved to {}'.format(plot_path))

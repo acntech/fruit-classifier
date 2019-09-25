@@ -1,17 +1,17 @@
 import argparse
-import pickle
 import random
 import json
 from pathlib import Path
 from fruit_classifier.utils.image_utils import get_image_paths
-from fruit_classifier.train.train_utils import get_data_and_labels
-from fruit_classifier.train.train_utils import get_model_input
+from fruit_classifier.train.train_utils import get_processed_data
 from fruit_classifier.train.train_utils import get_model
 from fruit_classifier.train.train_utils import train_model
 from fruit_classifier.train.train_utils import plot_training
 from fruit_classifier.preprocessing.preprocessing_utils import \
     get_image_generator
 
+
+# FIXME: Add issues to github
 
 def main(dataset_name='basic',
          model_name='basic',
@@ -48,6 +48,19 @@ def main(dataset_name='basic',
         Dictionary for optimizer setup.
         See input parameters of
         fruit_classifier.train.train_utils.get_model for details
+
+    Returns
+    -------
+    history : History
+        The training History object containing
+        - loss
+        - val_loss
+        - acc
+        - val_acc
+    x_test : np.array, shape (n_test, height, width, channels)
+        The data of the test set
+    y_test : np.array, shape (n_test,)
+        The labels of the test set
     """
 
     root_dir = Path(__file__).absolute().parents[2]
@@ -62,19 +75,17 @@ def main(dataset_name='basic',
     random.seed(42)
     random.shuffle(image_paths)
 
-    # Load the data and and label and split to train and validation
-    data_path = processed_dir.joinpath('data.pkl')
-    labels_path = processed_dir.joinpath('labels.pkl')
-    if data_path.is_file() and labels_path.is_file():
-        with data_path.open('rb') as f:
-            data = pickle.load(f)
-        with labels_path.open('rb') as f:
-            labels = pickle.load(f)
-    else:
-        data, labels = get_data_and_labels(image_paths, processed_dir)
-
-    x_train, x_val, y_train, y_val = \
-        get_model_input(data, labels, model_files_dir, model_name)
+    # Get the data
+    x_train,\
+        x_val,\
+        x_test,\
+        y_train,\
+        y_val,\
+        y_test = \
+        get_processed_data(image_paths,
+                           model_files_dir,
+                           model_name,
+                           processed_dir)
 
     # Construct the image generator for data augmentation
     image_generator = get_image_generator()
@@ -94,7 +105,7 @@ def main(dataset_name='basic',
                                epochs=2,
                                batch_size=32)
 
-    model = get_model(len(set(labels)), model_setup, optimizer_setup)
+    model = get_model(len(set(y_train)), model_setup, optimizer_setup)
 
     # Train the network
     history = train_model(model,
@@ -109,7 +120,11 @@ def main(dataset_name='basic',
                           epochs=optimizer_setup['epochs'])
 
     # Plot the training loss and accuracy
-    plot_training(history, plot_dir)
+    plot_training(history,
+                  plot_dir,
+                  f'{dataset_name}_{model_name}')
+
+    return history, x_test, y_test
 
 
 if __name__ == '__main__':
