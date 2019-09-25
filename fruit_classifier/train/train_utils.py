@@ -6,7 +6,7 @@ from keras.optimizers import Adam
 from keras.preprocessing.image import ImageDataGenerator
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 from fruit_classifier.models.factory import ModelFactory
 from fruit_classifier.utils.image_utils import open_image
 
@@ -141,7 +141,7 @@ def get_processed_data(image_paths,
         The test labels
     """
 
-    if processed_dir.joinpath('data.pkl').is_file():
+    if processed_dir.joinpath('y_val.pkl').is_file():
         x_train, x_val, x_test, y_train, y_val, y_test =\
             load_data_sets(processed_dir)
     else:
@@ -262,9 +262,11 @@ def encode_labels(labels, model_files_dir, model_name):
     encoded_labels : np.array, shape (n_labels, n_classes)
         The encoded labels
     """
-    label_encoder = LabelEncoder()
+
+    label_encoder = OneHotEncoder()
+    labels = labels.reshape(len(labels), 1)
     label_encoder.fit(labels)
-    encoded_labels = label_encoder.transform(labels)
+    encoded_labels = label_encoder.transform(labels).toarray()
     encoder_dir = model_files_dir.joinpath('encoders', model_name)
 
     if not encoder_dir.is_dir():

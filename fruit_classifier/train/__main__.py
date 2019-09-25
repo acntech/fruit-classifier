@@ -105,7 +105,7 @@ def main(dataset_name='basic',
                                epochs=2,
                                batch_size=32)
 
-    model = get_model(len(set(y_train)), model_setup, optimizer_setup)
+    model = get_model(y_train.shape[1], model_setup, optimizer_setup)
 
     # Train the network
     history = train_model(model,

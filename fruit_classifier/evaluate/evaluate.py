@@ -1,8 +1,6 @@
-import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
-import seaborn as sns
 from fruit_classifier.predict.predict_utils import inverse_encode
 
 
@@ -46,7 +44,6 @@ def plot_confusion_matrix(y_true_sorted,
     http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py
     https://matplotlib.org/gallery/images_contours_and_fields/image_annotated_heatmap.html#sphx-glr-gallery-images-contours-and-fields-image-annotated-heatmap-py
     """
-    sns.set(style='darkgrid')
 
     conf_mat = confusion_matrix(y_pred_sorted, y_true_sorted)
 
@@ -59,32 +56,34 @@ def plot_confusion_matrix(y_true_sorted,
                    conf_mat.sum(axis=1)[:, np.newaxis]
 
     fig, ax = plt.subplots(figsize=figsize)
+    im = ax.imshow(conf_mat, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
 
-    im_ax = ax.imshow(conf_mat,
-                      interpolation='nearest',
-                      cmap=cmap)
+    ax.set(xticks=np.arange(conf_mat.shape[1]),
+           yticks=np.arange(conf_mat.shape[0]),
+           xticklabels=class_names,
+           yticklabels=class_names,
+           title=title,
+           ylabel='True label',
+           xlabel='Predicted label')
+    ax.grid(False)
 
-    fig.suptitle(title)
-    _ = fig.colorbar(im_ax)
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(),
+             rotation=45,
+             ha="right",
+             rotation_mode="anchor")
 
-    # Make proper ticks
-    ax.set_xticks(np.arange(len(class_names)))
-    ax.set_yticks(np.arange(len(class_names)))
-    ax.set_xticklabels(class_names, rotation=90)
-    ax.set_yticklabels(class_names)
-
-    # Add text
+    # Loop over data dimensions and create text annotations.
     fmt = '.2f' if normalize else 'd'
     thresh = conf_mat.max() / 2.
-    for i, j in itertools.product(range(conf_mat.shape[0]),
-                                  range(conf_mat.shape[1])):
-        ax.text(j, i, format(conf_mat[i, j], fmt),
-                horizontalalignment="center",
-                color="white" if conf_mat[i, j] > thresh else "black")
-
-    ax.set_ylabel('Predicted label')
-    ax.set_xlabel('True label')
-    ax.grid(False)
+    for i in range(conf_mat.shape[0]):
+        for j in range(conf_mat.shape[1]):
+            ax.text(j, i, format(conf_mat[i, j], fmt),
+                    ha="center",
+                    va="center",
+                    color="white" if conf_mat[i, j] > thresh
+                    else "black")
     fig.tight_layout()
 
     plot_path = plot_dir.joinpath(f'{plot_name}_confusion.png')
@@ -97,8 +96,8 @@ def plot_confusion_matrix(y_true_sorted,
 
 def get_y_true_and_y_pred_sorted(model_files_dir,
                                  model_name,
-                                 y_true,
-                                 y_pred):
+                                 y_true_inv,
+                                 y_pred_inv):
     """
     Returns the sorted version of the ground truth and prediction
 
@@ -108,9 +107,9 @@ def get_y_true_and_y_pred_sorted(model_files_dir,
         Path to the model_files
     model_name : str
         Name of the model
-    y_true : np.array, shape (n, n_classes)
+    y_true_inv : np.array, shape (n, n_classes)
         The ground truth labels
-    y_pred : np.array, shape (n, n_classes)
+    y_pred_inv : np.array, shape (n, n_classes)
         The predicted labels
 
     Returns
@@ -121,11 +120,11 @@ def get_y_true_and_y_pred_sorted(model_files_dir,
         The predicted labels sorted after y_true_sorted
     """
 
-    y_true = inverse_encode(y_true, model_files_dir, model_name)
-    y_pred = inverse_encode(y_pred, model_files_dir, model_name)
+    y_true_inv = inverse_encode(y_true_inv, model_files_dir, model_name)
+    y_pred_inv = inverse_encode(y_pred_inv, model_files_dir, model_name)
 
     # Sort in alphabetical order
     y_true_sorted, y_pred_sorted =\
-        zip(*sorted(zip(y_true, y_pred)))
+        zip(*sorted(zip(y_true_inv.ravel(), y_pred_inv.ravel())))
 
     return tuple(y_true_sorted), tuple(y_pred_sorted)

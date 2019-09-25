@@ -83,16 +83,16 @@ def experiment_recipe(**_):
                                      test_labels,
                                      y_pred)
 
-    cm_path = plot_confusion_matrix(y_true_sorted,
-                                    y_pred_sorted,
-                                    plot_dir,
-                                    plot_name=model_name)
+    cm_path, _, _ = plot_confusion_matrix(y_true_sorted,
+                                          y_pred_sorted,
+                                          plot_dir,
+                                          plot_name=model_name)
 
     # Add to sacred
     log_history(ex, history)
     ex.add_artifact(str(cm_path), name=cm_path.name)
-    ex.log_scalar('cohens_kappa',
-                  cohen_kappa_score(y_true_sorted, y_pred_sorted))
+    ex.add_config({'cohens_kappa':
+                   cohen_kappa_score(y_true_sorted, y_pred_sorted)})
 
     # Will appear as "Result in omniboard"
     return accuracy_score(y_true_sorted, y_pred_sorted)

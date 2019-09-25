@@ -63,7 +63,10 @@ def classify_many(model, images):
     """
 
     probabilities = model.predict(images)
-    labels = np.argmax(probabilities, axis=1)
+    # Set the highest value in a row to 1, the rest to 0
+    labels = (probabilities == probabilities.max(axis=1,
+                                                 keepdims=True))\
+        .astype(int)
 
     return labels, probabilities
 
@@ -74,23 +77,28 @@ def inverse_encode(labels, model_files_dir, model_name):
 
     Parameters
     ----------
-    labels
-    model_files_dir
-    model_name
+    labels : np.array, shape (n, n_classes)
+        The labels to inverse transform
+    model_files_dir : Path
+        Path to the model_files
+    model_name : str
+        Name of the model
 
     Returns
     -------
-
+    inverse_transformed_labels : np.array, shape (n,)
+        The inverse transformed labels
     """
     # Load the label encoder
     encoder_path = model_files_dir.joinpath('encoders',
-                                           model_name,
-                                           'encoder.pkl')
+                                            model_name,
+                                            'encoder.pkl')
     with encoder_path.open('rb') as f:
         label_encoder = pickle.load(f)
-    labels = label_encoder.inverse_transform(labels)
 
-    return labels
+    inverse_transformed_labels = label_encoder.inverse_transform(labels)
+
+    return inverse_transformed_labels
 
 
 def load_classifier(model_files_dir, model_name='basic'):
