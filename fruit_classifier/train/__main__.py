@@ -102,7 +102,7 @@ def main(dataset_name='basic',
     # FIXME: This is also done in get_model :/
     if optimizer_setup is None:
         optimizer_setup = dict(initial_learning_rate=1e-3,
-                               epochs=2,
+                               epochs=20,
                                batch_size=32)
 
     model = get_model(y_train.shape[1], model_setup, optimizer_setup)

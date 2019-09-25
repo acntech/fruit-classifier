@@ -157,7 +157,7 @@ def classify_file(filename):
 
     # Clear any existing keras sessions and predict
     keras.backend.clear_session()
-    output = main(path, MODEL_FILES_DIR)
+    output = main(path, MODEL_FILES_DIR, model_name='basic')
 
     # Store the output image after converting to GBR
     cv2.imwrite(str(path), output[..., ::-1])
