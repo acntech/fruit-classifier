@@ -3,6 +3,7 @@ from fruit_classifier.utils.image_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
 from fruit_classifier.train.train_utils import get_data_split
 from fruit_classifier.train.train_utils import get_model
+from fruit_classifier.train.train_utils import encode_labels
 from fruit_classifier.train.train_utils import train_model
 from fruit_classifier.train.train_utils import plot_training
 from fruit_classifier.preprocessing.preprocessing_utils import \
@@ -63,7 +64,7 @@ class TestTrainUtils(unittest.TestCase):
         data, labels = \
             get_data_and_labels(self.image_paths)
         x_train, x_val, y_train, y_val = \
-            get_data_split(data, labels, self.model_files_dir)
+            get_data_split(data, labels)
         self.assertEqual(1, len(x_train))
         self.assertEqual(1, len(x_val))
         self.assertEqual(1, len(y_train))
@@ -110,11 +111,14 @@ class TestTrainUtils(unittest.TestCase):
         # Re-run image paths after resizing (extension may be altered)
         image_paths = get_image_paths(self.tmp_dir)
         # Run train_model and verify outputs
-        data, labels = \
-            get_data_and_labels(image_paths)
+        data, labels = get_data_and_labels(image_paths)
+
+        encoded_labels = encode_labels(labels,
+                                       self.model_files_dir,
+                                       'test')
 
         x_train, x_val, y_train, y_val = \
-            get_data_split(data, labels, self.model_files_dir)
+            get_data_split(data, encoded_labels)
         image_generator = get_image_generator()
 
         model = get_model(self.n_classes,
