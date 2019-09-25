@@ -21,6 +21,10 @@ def plot_confusion_matrix(y_true_sorted,
         The ground truth sorted alphabetically
     y_pred_sorted : array-like
         The predicted values sorted alphabetically
+    plot_dir : Path
+        Path to the plotting directory
+    plot_name : str
+        Name of the plot
     normalize : bool
         Whether to have absolute count or percentage
     title : str

@@ -102,9 +102,10 @@ def log_history(ex, history):
         - acc
         - val_acc
 
-    Resources
-    ---------
-    [1] https://www.hhllcks.de/blog/2018/5/4/version-your-machine-learning-models-with-sacred
+    References
+    ----------
+    [1]
+    https://www.hhllcks.de/blog/2018/5/4/version-your-machine-learning-models-with-sacred
     """
 
     h = history.history

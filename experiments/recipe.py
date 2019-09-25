@@ -19,7 +19,8 @@ from experiments.utils import log_history
 ex = Experiment()
 ex.observers.append(
     MongoObserver.create(
-        url=f'mongodb://sample:password@localhost:27017/?authMechanism=SCRAM-SHA-1',
+        url=(f'mongodb://sample:password@localhost:27017/'
+             f'?authMechanism=SCRAM-SHA-1'),
         db_name='db'))
 
 # Avoid linefeed capture
@@ -35,14 +36,8 @@ def experiment_recipe(**_):
     -----
     The final **_ is used to capture parts of the configuration which is
     just added to the omniboard.
-    See classifier_experiments_runner.add_ocr_options_to_omniboard for details
-
-    Parameters
-    ----------
-    experiment_file : str
-        The name of the experiment file which contains the parameters of
-        the experiment.
-        The file must be found in experiment_files/
+    See classifier_experiments_runner.add_ocr_options_to_omniboard
+    for details
     """
 
     # NOTE: *arg and **kwarg cannot be used to capture the

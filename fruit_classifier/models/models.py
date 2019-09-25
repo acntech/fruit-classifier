@@ -24,6 +24,8 @@ def lenet(height=28,
         Number of channels
     classes : int
         Number of prediction classes
+    dropout : float
+        Fraction of nodes to drop-out
 
     Returns
     -------

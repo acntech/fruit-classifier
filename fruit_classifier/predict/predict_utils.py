@@ -121,8 +121,8 @@ def load_classifier(model_files_dir, model_name='basic'):
     print('[INFO] loading network...')
 
     model_path = model_files_dir.joinpath('models',
-                                         model_name,
-                                         'model.h5')
+                                          model_name,
+                                          'model.h5')
     model = load_model(str(model_path))
 
     return model
