@@ -35,6 +35,7 @@ services:
       - ./../data:/fruit-classifier/data
       - ./../model_files:/fruit-classifier/model_files
       - ./../reports:/fruit-classifier/reports
+      - ./../experiment_files:/fruit-classifier/experiment_files
     networks:
       - omniboard
     depends_on:

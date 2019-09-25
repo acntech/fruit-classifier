@@ -129,7 +129,7 @@ def main(dataset_name='basic',
 
 if __name__ == '__main__':
     # Construct the argument parse and parse the arguments
-    parser = argparse.ArgumentParser(description='Preprocess a dataset')
+    parser = argparse.ArgumentParser(description='Train a model')
     parser.add_argument('-d',
                         '--dataset_name',
                         required=False,
