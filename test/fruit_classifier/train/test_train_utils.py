@@ -1,7 +1,7 @@
 import unittest
 from fruit_classifier.utils.image_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
-from fruit_classifier.train.train_utils import get_model_input
+from fruit_classifier.train.train_utils import get_data_split
 from fruit_classifier.train.train_utils import get_model
 from fruit_classifier.train.train_utils import train_model
 from fruit_classifier.train.train_utils import plot_training
@@ -54,16 +54,16 @@ class TestTrainUtils(unittest.TestCase):
     def test_get_data_and_labels(self):
         # Run get_data_and_labels and verify outputs
         data, labels = \
-            get_data_and_labels(self.image_paths, self.processed_dir)
+            get_data_and_labels(self.image_paths)
         self.assertGreater(len(data), 0)
         self.assertGreater(len(labels), 0)
 
     def test_get_model_input(self):
-        # Run get_model_input and verify outputs
+        # Run get_data_split and verify outputs
         data, labels = \
-            get_data_and_labels(self.image_paths, self.processed_dir)
+            get_data_and_labels(self.image_paths)
         x_train, x_val, y_train, y_val = \
-            get_model_input(data, labels, self.model_files_dir)
+            get_data_split(data, labels, self.model_files_dir)
         self.assertEqual(1, len(x_train))
         self.assertEqual(1, len(x_val))
         self.assertEqual(1, len(y_train))
@@ -111,10 +111,10 @@ class TestTrainUtils(unittest.TestCase):
         image_paths = get_image_paths(self.tmp_dir)
         # Run train_model and verify outputs
         data, labels = \
-            get_data_and_labels(image_paths, self.processed_dir)
+            get_data_and_labels(image_paths)
 
         x_train, x_val, y_train, y_val = \
-            get_model_input(data, labels, self.model_files_dir)
+            get_data_split(data, labels, self.model_files_dir)
         image_generator = get_image_generator()
 
         model = get_model(self.n_classes,

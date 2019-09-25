@@ -83,3 +83,37 @@ def get_configuration(experiment_file):
                 ast.literal_eval(config[section][keyword])
 
     return config_dict
+
+
+def log_history(ex, history):
+    """
+    Logs the history after the run
+
+    For real time logging, see for example [1]_
+
+    Parameters
+    ----------
+    ex : Experiment
+        The experiment object to use
+    history : History
+        The training History object containing
+        - loss
+        - val_loss
+        - acc
+        - val_acc
+
+    Resources
+    ---------
+    [1] https://www.hhllcks.de/blog/2018/5/4/version-your-machine-learning-models-with-sacred
+    """
+
+    h = history.history
+
+    for loss, acc, val_loss, val_acc in zip(h['loss'],
+                                            h['acc'],
+                                            h['val_loss'],
+                                            h['val_acc']):
+        ex.log_scalar('loss', loss)
+        ex.log_scalar('acc', acc)
+        ex.log_scalar('val_loss', val_loss)
+        ex.log_scalar('val_acc', val_acc)
