@@ -49,7 +49,7 @@ machine and the containers.
 In order to enter the `fruit_classifier` container type
 
 ```bash
-docker exec -i -t docker_fruit_classifier_1 /bin/bash
+docker exec -i -t docker_fruit_classifier_1 bash
 ```
 
 You should now be inside of the shell of the container, and you can
