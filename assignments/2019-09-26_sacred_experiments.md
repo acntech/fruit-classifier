@@ -56,10 +56,15 @@ You should now be inside of the shell of the container, and you can
 run terminal commands. In order to run the first experiment, type
 
 ```bash
-python3 -m experiments
+python3 -m experiments -e first_experiment.ini
 ```
 
-Head over to [omniboard](http://0.0.0.0:9000) to check the results of
+**NOTE**: In order for this to pass without errors, you need to have
+ some data in the `data/interim` directory. You can either scrape and
+ preprocess (which can take some time), or you can use images from
+ previous exercises
+
+Head over to [omniboard](http://localhost:9000) to check the results of
 your run.
 
 Once you are done playing around with this exercise, head back to the
