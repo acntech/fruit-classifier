@@ -71,6 +71,10 @@ docker-compose down -v
 
 ## Assignments
 
+Apart from the assignments below, feel free to try your software
+ engineering skills by assigning yourself to one of the tasks in the 
+ [issue-tracker](https://github.com/acntech/fruit-classifier/issues)
+
 1. Make a new experiment in the `experiment_files` directory where you
  change any parameter but `model_type`
 2. Make a new model architecture in `fruit_classifier/models/models.py`,

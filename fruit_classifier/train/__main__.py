@@ -11,8 +11,6 @@ from fruit_classifier.preprocessing.preprocessing_utils import \
     get_image_generator
 
 
-# FIXME: Add issues to github
-
 def main(dataset_name='basic',
          model_name='basic',
          model_setup=None,
@@ -99,7 +97,6 @@ def main(dataset_name='basic',
         model_setup['width'],\
         model_setup['channels'] = x_train.shape[1:]
 
-    # FIXME: This is also done in get_model :/
     if optimizer_setup is None:
         optimizer_setup = dict(initial_learning_rate=1e-3,
                                epochs=20,

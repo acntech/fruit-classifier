@@ -323,8 +323,6 @@ def get_model(n_classes, model_setup=None, optimizer_setup=None):
     model_setup['classes'] = n_classes
     model = ModelFactory.create_model(model_type, model_setup)
 
-    # FIXME: Enable setup knobs outside of just initial_learning rate
-    #        and epochs
     if optimizer_setup is None:
         optimizer_setup = dict(initial_learning_rate=1e-3,
                                epochs=25)
