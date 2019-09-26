@@ -42,9 +42,9 @@ def draw_class_on_image(image, probability_text):
     return output_image
 
 
-def classify(model, images):
+def classify_many(model, images):
     """
-    Classifies a single image and returns the label and probability
+    Classifies a images and returns the labels and probabilities
 
     Parameters
     ----------
@@ -55,44 +55,74 @@ def classify(model, images):
 
     Returns
     -------
-    labels : np.array, shape (examples, )
-        The label with the highest probability
+    labels : np.array, shape (examples, n_classes)
+        The labels with the highest probability
     probabilities : np.array, shape (examples, n_classes)
         The probabilities of all the classes according to the label
         encoder
     """
+
     probabilities = model.predict(images)
-    labels = np.argmax(probabilities, axis=1)
-
-    # Load the label encoder
-    encoder_dir = \
-        Path(__file__).absolute().parents[2].joinpath('generated_data',
-                                                      'encoders')
-    encoder_path = encoder_dir.joinpath('encoder.pkl')
-
-    with encoder_path.open('rb') as f:
-        label_encoder = pickle.load(f)
-
-    labels = label_encoder.inverse_transform(labels)
+    # Set the highest value in a row to 1, the rest to 0
+    labels = (probabilities == probabilities.max(axis=1,
+                                                 keepdims=True))\
+        .astype(int)
 
     return labels, probabilities
 
 
-def load_classifier():
+def inverse_encode(labels, model_files_dir, model_name):
+    """
+    Inverse encodes the labels
+
+    Parameters
+    ----------
+    labels : np.array, shape (n, n_classes)
+        The labels to inverse transform
+    model_files_dir : Path
+        Path to the model_files
+    model_name : str
+        Name of the model
+
+    Returns
+    -------
+    inverse_transformed_labels : np.array, shape (n,)
+        The inverse transformed labels
+    """
+    # Load the label encoder
+    encoder_path = model_files_dir.joinpath('encoders',
+                                            model_name,
+                                            'encoder.pkl')
+    with encoder_path.open('rb') as f:
+        label_encoder = pickle.load(f)
+
+    inverse_transformed_labels = label_encoder.inverse_transform(labels)
+
+    return inverse_transformed_labels
+
+
+def load_classifier(model_files_dir, model_name='basic'):
     """
     Loads the classifier
+
+    Parameters
+    ----------
+    model_files_dir : Path
+        Path to the model files directory
+    model_name : str
+        Name of the model
 
     Returns
     -------
     model : Sequential
-        The model to classify from
+        The model to classify_many from
     """
 
     print('[INFO] loading network...')
-    model_dir = \
-        Path(__file__).absolute().parents[2].joinpath('generated_data',
-                                                      'models')
-    model_path = model_dir.joinpath('model.h5')
+
+    model_path = model_files_dir.joinpath('models',
+                                          model_name,
+                                          'model.h5')
     model = load_model(str(model_path))
 
     return model

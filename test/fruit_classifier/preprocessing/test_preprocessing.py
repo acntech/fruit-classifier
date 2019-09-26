@@ -3,30 +3,29 @@ import cv2
 from pathlib import Path
 import numpy as np
 import shutil
+from fruit_classifier.utils.file_utils import truncate_filenames
 from fruit_classifier.preprocessing.preprocessing_utils \
-    import truncate_filenames
-from fruit_classifier.preprocessing.preprocessing_utils \
-    import preprocess_image
+    import resize_image
 
 
 class TestPreprocessingUtils(unittest.TestCase):
 
     def setUp(self):
 
-        self.test_dir = Path(__file__).absolute().parents[1]
+        self.test_dir = Path(__file__).absolute().parents[2]
         self.jpg_image_file_name = self.test_dir.joinpath(
-            "test_data", "original_test_image.jpg")
+            "data", "original_test_image.jpg")
         self.tmp_dir_path = self.test_dir.joinpath('tmp_dir')
 
         # Correct dimensions
         self.test_raw_shape = [115, 73, 3]
-        self.test_comp_shape = [28, 28, 3]
+        self.test_comp_shape = [27, 29, 3]
 
         # Read test image from file
         self.raw = cv2.imread(str(self.jpg_image_file_name))
 
         # Create a compressed version
-        self.comp = preprocess_image(self.raw)
+        self.comp = resize_image(self.raw, height=27, width=29)
 
     def tearDown(self):
         # Tear down the tmp_dir if it has been created

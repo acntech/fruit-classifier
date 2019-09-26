@@ -1,48 +1,51 @@
 import unittest
-from fruit_classifier.train.train_utils import get_image_paths
+from fruit_classifier.utils.image_utils import get_image_paths
 from fruit_classifier.train.train_utils import get_data_and_labels
-from fruit_classifier.train.train_utils import get_model_input
+from fruit_classifier.train.train_utils import get_data_split
 from fruit_classifier.train.train_utils import get_model
+from fruit_classifier.train.train_utils import encode_labels
 from fruit_classifier.train.train_utils import train_model
 from fruit_classifier.train.train_utils import plot_training
 from fruit_classifier.preprocessing.preprocessing_utils import \
     get_image_generator
+from fruit_classifier.preprocessing.preprocessing_utils import \
+    resize_images
 from pathlib import Path
 import shutil
 
 
 class TestTrainUtils(unittest.TestCase):
     def setUp(self):
-        test_dir = Path(__file__).absolute().parents[1]
+        test_dir = Path(__file__).absolute().parents[2]
 
         # Select a unique directory name for a new directory
-        directory_name = 'temp_directory'
-        self.directory_name = test_dir.joinpath(directory_name)
-        while self.directory_name.is_dir():
-            directory_name = directory_name + '_'
-            self.directory_name = test_dir.joinpath(directory_name)
+        self.tmp_dir = test_dir.joinpath('tmp_dir')
+        self.processed_dir = self.tmp_dir.joinpath('processed')
+        self.model_files_dir = self.tmp_dir.joinpath('model_files')
+        self.plot_dir = self.tmp_dir.joinpath('figures')
 
         # Make directory and two subdirectories
         classes = ('class_a', 'class_b')
         self.n_classes = len(classes)
 
         for c in classes:
-            self.directory_name.joinpath(c).mkdir(parents=True,
-                                                  exist_ok=True)
+            self.tmp_dir.joinpath(c).mkdir(parents=True,
+                                           exist_ok=True)
 
         # Copy an image into each of those subdirectories
-        orig_file_path = test_dir.joinpath("test_data").\
+        orig_file_path = test_dir.joinpath("data").\
             joinpath("original_test_image.jpg")
-        
+
         for c in classes:
             shutil.copy(str(orig_file_path),
-                        str(self.directory_name.joinpath(c)))
+                        str(self.tmp_dir.joinpath(c)))
 
         # Get the image_paths
-        self.image_paths = get_image_paths(self.directory_name)
+        self.image_paths = get_image_paths(self.tmp_dir)
 
         # Set number of epochs globally
-        self.num_intended_epochs = 2
+        self.optimizer_setup = dict(initial_learning_rate=1e-3,
+                                    epochs=2)
 
     def test_get_image_paths(self):
         # Run get_image_paths() and verify outputs
@@ -51,14 +54,17 @@ class TestTrainUtils(unittest.TestCase):
 
     def test_get_data_and_labels(self):
         # Run get_data_and_labels and verify outputs
-        data, labels = get_data_and_labels(self.image_paths)
+        data, labels = \
+            get_data_and_labels(self.image_paths)
         self.assertGreater(len(data), 0)
         self.assertGreater(len(labels), 0)
 
     def test_get_model_input(self):
-        # Run get_model_input and verify outputs
-        data, labels = get_data_and_labels(self.image_paths)
-        x_train, x_val, y_train, y_val = get_model_input(data, labels)
+        # Run get_data_split and verify outputs
+        data, labels = \
+            get_data_and_labels(self.image_paths)
+        x_train, x_val, y_train, y_val = \
+            get_data_split(data, labels)
         self.assertEqual(1, len(x_train))
         self.assertEqual(1, len(x_val))
         self.assertEqual(1, len(y_train))
@@ -96,27 +102,38 @@ class TestTrainUtils(unittest.TestCase):
     def test_get_model(self):
         # Run get_model and verify outputs
         model = get_model(self.n_classes,
-                          epochs=self.num_intended_epochs)
+                          optimizer_setup=self.optimizer_setup)
         self.assertTrue(model._built)
 
     def test_train_model(self):
+        # Resize the images
+        resize_images(self.tmp_dir)
+        # Re-run image paths after resizing (extension may be altered)
+        image_paths = get_image_paths(self.tmp_dir)
         # Run train_model and verify outputs
-        data, labels = get_data_and_labels(self.image_paths)
-        x_train, x_val, y_train, y_val = get_model_input(data, labels)
+        data, labels = get_data_and_labels(image_paths)
+
+        encoded_labels = encode_labels(labels,
+                                       self.model_files_dir,
+                                       'test')
+
+        x_train, x_val, y_train, y_val = \
+            get_data_split(data, encoded_labels)
         image_generator = get_image_generator()
 
         model = get_model(self.n_classes,
-                          epochs=self.num_intended_epochs)
+                          optimizer_setup=self.optimizer_setup)
 
         history = train_model(model,
                               image_generator,
+                              self.model_files_dir,
                               x_train,
                               y_train,
                               x_val,
                               y_val,
-                              epochs=self.num_intended_epochs)
+                              epochs=self.optimizer_setup['epochs'])
         num_epochs = history.params['epochs']
-        self.assertEqual(num_epochs, self.num_intended_epochs)
+        self.assertEqual(num_epochs, self.optimizer_setup['epochs'])
 
     def test_plot_training(self):
         # Run plot_training and verify it does not crash
@@ -126,13 +143,13 @@ class TestTrainUtils(unittest.TestCase):
         history = History
         history.history = dict(loss=(1, 2),
                                val_loss=(1, 2),
-                               acc=(1, 2),
-                               val_acc=(1, 2),)
-        plot_training(history)
+                               accuracy=(1, 2),
+                               val_accuracy=(1, 2),)
+        plot_training(history, self.plot_dir)
 
     def tearDown(self):
         # Delete the temporary directory its contents
-        shutil.rmtree(self.directory_name)
+        shutil.rmtree(self.tmp_dir)
 
 
 if __name__ == "__main__":

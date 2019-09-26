@@ -15,7 +15,9 @@ from fruit_classifier.predict.__main__ import main
 app = Flask(__name__)
 
 # Make upload directory and allowed extensions visible in file scope
-UPLOAD_DIR = Path(__file__).absolute().parents[2].joinpath('upload_dir')
+ROOT_DIR = Path(__file__).absolute().parents[1]
+UPLOAD_DIR = ROOT_DIR.joinpath('upload_dir')
+MODEL_FILES_DIR = ROOT_DIR.joinpath('model_files')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 if not UPLOAD_DIR.is_dir():
@@ -149,16 +151,16 @@ def classify_file(filename):
     -------
     Response
         Displays the predicted image in prediction.html
-        This webpage also contains a button to start over
+        This web page also contains a button to start over
     """
     path = Path(app.config['UPLOAD_DIR']).joinpath(filename)
 
     # Clear any existing keras sessions and predict
     keras.backend.clear_session()
-    output = main(path)
+    output = main(path, MODEL_FILES_DIR, model_name='basic')
 
-    # Store the output image
-    cv2.imwrite(str(path), output)
+    # Store the output image after converting to GBR
+    cv2.imwrite(str(path), output[..., ::-1])
 
     # The image is encoded to base64 in order to display it
     result_b64 = base64.b64encode(path.read_bytes()).decode('utf-8')
@@ -166,4 +168,9 @@ def classify_file(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port='5000')
+    # NOTE: Threaded is set to False to have the loaded model on the
+    #       same thread
+    #       See
+    #       https://stackoverflow.com/questions/49400440/using-keras-model-in-flask-app-with-threading
+    #       for details
+    app.run(debug=False, host='0.0.0.0', port='5000', threaded=False)

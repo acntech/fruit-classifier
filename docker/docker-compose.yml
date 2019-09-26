@@ -1,0 +1,46 @@
+version: '3'
+services:
+
+  mongo:
+    image: mongo
+    ports:
+      - 127.0.0.1:27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sample
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: db
+    volumes:
+      - ./../data/db:/data/db
+    expose:
+      - 27017
+    networks:
+      - omniboard
+
+  omniboard:
+    image: vivekratnavel/omniboard:latest
+    command: ["--mu", "mongodb://sample:password@mongo:27017/db?authSource=admin"]
+    ports:
+      - 127.0.0.1:9000:9000
+    networks:
+      - omniboard
+    depends_on:
+      - mongo
+
+  fruit_classifier:
+    image: loeiten/fruit_classifier:latest
+    command: ["-m", "app"]
+    ports:
+      - 0.0.0.0:5000:5000
+    volumes:
+      - ./../data:/fruit-classifier/data
+      - ./../model_files:/fruit-classifier/model_files
+      - ./../reports:/fruit-classifier/reports
+      - ./../experiment_files:/fruit-classifier/experiment_files
+    networks:
+      - omniboard
+    depends_on:
+      - omniboard
+
+networks:
+  omniboard:
+    driver: bridge

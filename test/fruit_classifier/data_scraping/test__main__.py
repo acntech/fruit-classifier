@@ -21,8 +21,8 @@ class TestDataScraping(unittest.TestCase):
 
     def setUp(self):
         self.root_dir = Path(__file__).absolute().parents[2]
-        self.destination_dir = self.root_dir.joinpath('generated_data',
-                                                      'raw_data')
+        self.destination_dir = self.root_dir.joinpath('data',
+                                                      'raw')
 
     @patch("google_images_download.google_images_download."
            "googleimagesdownload",

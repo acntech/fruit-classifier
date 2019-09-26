@@ -1,10 +1,17 @@
 .git
 .pytest_cache
 .DS_Store
+.idea
+*.swp
+*.swo
+*.bak
 chromedriver*
 docker/
-generated_data/
+data/
+backup/
+reports/
+upload_dir/
+__pycache__/
 
-# Unignore the encoders and models
-!generated_data/encoders
-!generated_data/models
+# Unignore
+!test/data

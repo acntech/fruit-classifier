@@ -1,5 +1,5 @@
 import unittest
-from fruit_classifier.models.models import get_lenet
+from fruit_classifier.models.factory import ModelFactory
 
 
 class TestModels(unittest.TestCase):
@@ -9,8 +9,11 @@ class TestModels(unittest.TestCase):
         intended_channels = 5
         intended_classes = 4
 
-        model = get_lenet(intended_height, intended_width,
-                          intended_channels, intended_classes)
+        setup = dict(height=intended_height,
+                     width=intended_width,
+                     channels=intended_channels,
+                     classes=intended_classes)
+        model = ModelFactory.create_model('leNet', setup)
         shape = model.input_shape
         model_height = shape[1]
         model_width = shape[2]

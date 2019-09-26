@@ -1,61 +1,16 @@
 import cv2
+import imghdr
 from keras.preprocessing.image import ImageDataGenerator
 from tqdm import tqdm
 from skimage.transform import resize
+from skimage.io import imsave
 from pathlib import Path
 from fruit_classifier.utils.file_utils import copytree
+from fruit_classifier.utils.image_utils import get_image_paths, \
+    open_image
 
 
-def truncate_filenames(raw_dir):
-    """
-    Truncate file names so path length <= 255 characters
-
-    Assumes raw_dir is a directory that contains ONLY directories,
-    in which all files/directories will be truncated if their total
-    path length is more than 255 characters.
-
-    Parameters
-    ----------
-    raw_dir: Will truncate files in raw_dir's subfolders
-
-    """
-
-    subdirectory_list = [p for p in Path(raw_dir).glob('*')
-                         if p.is_dir()]
-    print("Reducing length of filenames so that combined path to a "
-          "file is maximum 255 characters long")
-    max_windows_path_length = 255
-
-    for sub_dir_path in subdirectory_list:
-
-        # length of directory path + "/"
-        sub_dir_len = len(str(sub_dir_path)) + 1
-        # length available for image file name including type
-        available_max_len = max_windows_path_length - sub_dir_len
-        # Get all files in directory
-        file_list = list(Path(sub_dir_path).glob('*'))
-        num_renamed = 0
-        for filepath in file_list:
-            filename = filepath.name
-            file_path_len = len(filename)
-            if file_path_len <= max_windows_path_length:
-                continue
-            possible_types = filename.split('.')
-            file_type = possible_types[-1]
-            cut_position = available_max_len - len(file_type) - 1
-            new_name = filename[0:cut_position] + '.' + file_type
-
-            old_path = sub_dir_path.joinpath(filename)
-            new_path = sub_dir_path.joinpath(new_name)
-
-            Path.rename(old_path, new_path)
-            num_renamed = num_renamed + 1
-        print('Truncated ' + str(num_renamed)
-              + ' filenames in directory: '
-              + str(sub_dir_path.name))
-
-
-def remove_non_images(raw_dir, clean_dir):
+def copy_valid_images(raw_dir, interim_dir):
     """
     Removes images which are not readable
 
@@ -63,14 +18,14 @@ def remove_non_images(raw_dir, clean_dir):
     ----------
     raw_dir : Path
         Path to the raw dataset
-    clean_dir : Path
+    interim_dir : Path
         Path for the cleaned dataset
     """
 
-    copytree(raw_dir, clean_dir)
+    copytree(raw_dir, interim_dir)
 
     # Find all image_paths
-    image_paths = sorted(clean_dir.glob('**/*'))
+    image_paths = sorted(interim_dir.glob('**/*'))
     image_paths = [image_path for image_path in image_paths if
                    image_path.is_file()]
 
@@ -84,38 +39,74 @@ def remove_non_images(raw_dir, clean_dir):
     raw_dirs = sorted(raw_dir.glob('*'))
     raw_dirs = [d for d in raw_dirs if d.is_dir()]
 
-    clean_dirs = sorted(clean_dir.glob('*'))
-    clean_dirs = [d for d in clean_dirs if d.is_dir()]
+    interim_dirs = sorted(interim_dir.glob('*'))
+    interim_dirs = [d for d in interim_dirs if d.is_dir()]
 
     print('\nResult of cleaning:')
-    for r, c in zip(raw_dirs, clean_dirs):
+    for r, c in zip(raw_dirs, interim_dirs):
         n_raw = len(list(r.glob('*')))
         n_clean = len(list(c.glob('*')))
         print('    {}/{} remaining in {}'.format(n_clean, n_raw, c))
 
 
-def preprocess_image(image):
+def resize_image(image, height=28, width=28):
     """
-    Pre-processes a single image
+    Resize a single image
 
     Parameters
     ----------
     image : np.array, shape (height, width, channels)
         The image to resize
+    height : int
+        Height of the resized image
+    width : int
+        Width of the resized image
 
     Returns
     -------
-    preprocessed_image : np.array, shape (new_h, new_w, new_c)
-        The preprocessed image
+    resized_image : np.array, shape (new_h, new_w, new_c)
+        The resized image
     """
 
-    preprocessed_image = resize(image,
-                                output_shape=(28, 28),
-                                mode='reflect',
-                                anti_aliasing=True)
-    preprocessed_image = preprocessed_image / 255.0
+    resized_image = resize(image,
+                           output_shape=(height, width),
+                           mode='reflect',
+                           anti_aliasing=True)
 
-    return preprocessed_image
+    return resized_image.astype('uint8')
+
+
+def resize_images(path, height=28, width=28):
+    """
+    Overwrites the images in `path` with the resized version
+
+    Parameters
+    ----------
+    path : Path
+        The path to the image files
+    height : int
+        Height of the resized images
+    width : int
+        Width of the resized images
+    """
+    image_paths = get_image_paths(path)
+
+    for image_path in tqdm(image_paths, desc='Resizing images'):
+        tqdm.write(str(image_path))
+        image_array = open_image(image_path)
+        resized_array = resize_image(image_array, height, width)
+        # Determine image type as imsave is sensitive to the file
+        # extension
+        extension = imghdr.what(image_path)
+        extension = f'.{extension}' if extension is not None else '.png'
+        if extension == image_path.suffix:
+            save_path = image_path
+        else:
+            save_path = \
+                image_path.parent.joinpath(image_path.stem + extension)
+            image_path.unlink()
+
+        imsave(save_path, resized_array)
 
 
 def get_image_generator(rotation_range=30,

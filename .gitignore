@@ -9,9 +9,6 @@ __pycache__/
 # C extensions
 *.so
 
-# Ignore exe files
-*.exe
-
 # Distribution / packaging
 .Python
 build/
@@ -119,7 +116,12 @@ dmypy.json
 # Own
 *.swp
 *.swo
+*.bak
 .idea/
 .DS_Store
-generated_data/
+backup/
+data/
+model_files/
+reports/
 chromedriver
+upload_dir/
