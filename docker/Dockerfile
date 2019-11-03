@@ -39,6 +39,8 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /fruit-classifier/
 
 # Set display port to avoid crash
 ENV DISPLAY=:99
+# Avoid error: UnicodeDecodeError: 'ascii' codec can't decode byte 0xe2 in position 10799: ordinal not in range(128)
+ENV LC_ALL=C.UTF-8
 
 # We copy just the requirements.txt first to leverage Docker cache
 COPY ./requirements.txt /fruit-classifier/requirements.txt
