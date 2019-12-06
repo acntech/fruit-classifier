@@ -28,23 +28,9 @@ ex.captured_out_filter = apply_backspaces_and_linefeeds
 
 
 @ex.main
-def experiment_recipe(**_):
-    """
-    Runs a classifier experiment
+def experiment_recipe():
+    """Run an experiment."""
 
-    Notes
-    -----
-    The final **_ is used to capture parts of the configuration which is
-    just added to the omniboard.
-    See classifier_experiments_runner.add_ocr_options_to_omniboard
-    for details
-    """
-
-    # NOTE: *arg and **kwarg cannot be used to capture the
-    #       configurations given in the caller routine
-    #       As we prefer .ini files over @ex.config,
-    #       the configuration is read anew (__main__.run_experiment
-    #       just adds the configuration to sacred)
     config = get_configuration(ex.path)
 
     pre_main(config['preprocessing']['dataset_name'],

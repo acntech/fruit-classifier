@@ -9,12 +9,18 @@ services:
       MONGO_INITDB_ROOT_USERNAME: sample
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: db
+    # Volumes cannot be mounted properly in windows
+    # For details, see
+    # http://beyondthecorneroffice.com/2018-04-18-MongoDB-on-Windows-Docker/
+    # For a workaround see
+    # https://blog.jeremylikness.com/blog/2018-12-27_mongodb-on-windows-in-minutes-with-docker/
+    # https://stackoverflow.com/questions/37705017/create-named-docker-volume-with-docker-compose
     volumes:
-      - ./../data/db:/data/db
+      - mongo_omniboard_db:/data/db
     expose:
       - 27017
     networks:
-      - omniboard
+      - omniboard_fruitclassifier
 
   omniboard:
     image: vivekratnavel/omniboard:latest
@@ -22,7 +28,7 @@ services:
     ports:
       - 127.0.0.1:9000:9000
     networks:
-      - omniboard
+      - omniboard_fruitclassifier
     depends_on:
       - mongo
 
@@ -37,10 +43,14 @@ services:
       - ./../reports:/fruit-classifier/reports
       - ./../experiment_files:/fruit-classifier/experiment_files
     networks:
-      - omniboard
+      - omniboard_fruitclassifier
     depends_on:
       - omniboard
 
 networks:
-  omniboard:
+  omniboard_fruitclassifier:
     driver: bridge
+
+volumes:
+  mongo_omniboard_db:
+    external: false
